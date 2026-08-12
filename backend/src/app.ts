@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import ldap from 'ldapjs';
 import path from 'path';
 import jwt from 'jsonwebtoken';
+import apiRoutes from './routes/api.routes';
 
 // Carga las variables de entorno desde el archivo .env en la raíz del proyecto
 // En un entorno de testing, podemos querer mockear esto
@@ -98,5 +99,8 @@ app.post('/api/auth/login', (req: Request, res: Response): any => {
     });
   });
 });
+
+// Registrar todas las rutas protegidas bajo el prefijo /api
+app.use('/api', apiRoutes);
 
 export default app;
