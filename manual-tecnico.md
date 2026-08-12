@@ -41,5 +41,5 @@ Se ha migrado de las herramientas antiguas (Karma/Jasmine) al nuevo ecosistema d
 2.  El Backend realiza un *LDAP Bind* hacia el servidor Samba4 por LDAPS.
 3.  Si el Bind es exitoso, el Backend firma un JWT y lo devuelve al Frontend.
 4.  El Frontend almacena el JWT en el `localStorage` y levanta una *Signal* de sesión.
-5.  Los **Angular Route Guards** (`authGuard`) bloquean el acceso a las rutas protegidas a nivel del cliente (comprobando la existencia del token o redirigiendo generando un `UrlTree`).
-*(Pendiente: Implementar HttpInterceptor para securizar las llamadas salientes)*.
+5.  Los **Angular Route Guards** (`authGuard`) bloquean el acceso a las rutas protegidas a nivel del cliente.
+6.  Un **HttpInterceptor** (`jwtInterceptor`) intercepta silenciosamente todas las llamadas salientes del `HttpClient`. Si existe un token, inyecta la cabecera `Authorization: Bearer <token>`. Además, si recibe un error `401 Unauthorized` de cualquier respuesta, fuerza el cierre de sesión instantáneo y protege la aplicación.
