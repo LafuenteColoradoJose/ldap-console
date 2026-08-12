@@ -1,0 +1,24 @@
+# Entornos
+.env
+
+# Dependencias Node
+node_modules/
+
+# Archivos de compilación TypeScript
+dist/
+out/
+build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Carpetas de datos de infraestructura antigua (si existen)
+infra-data/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,34 @@
+services:
+  samba-ad:
+    image: nowsci/samba-domain
+    container_name: ldap-console-ad
+    privileged: true
+    environment:
+      # Lee las variables del archivo .env
+      - DOMAIN=${AD_DOMAIN}
+      - DOMAINPASS=${AD_PASSWORD}
+      - OPTIONS=--use-rfc2307
+    ports:
+      # DNS (Comentar en Linux de escritorio si el puerto 53 da error)
+      # - "53:53/tcp"
+      # - "53:53/udp"
+      - "88:88/tcp"
+      - "88:88/udp"
+      - "464:464/tcp"
+      - "464:464/udp"
+      - "135:135/tcp"
+      - "137-138:137-138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+      - "389:389/tcp"
+      - "389:389/udp"
+      - "636:636/tcp"
+      - "3268-3269:3268-3269/tcp"
+    volumes:
+      - samba-data:/var/lib/samba
+      - samba-config:/etc/samba
+    restart: unless-stopped
+
+volumes:
+  samba-data:
+  samba-config:
