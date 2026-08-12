@@ -1,0 +1,17 @@
+.header-toolbar {
+  background-color: var(--mat-sys-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface);
+}
+
+.title {
+  margin-left: 16px;
+  font-weight: 500;
+}
+
+/* Hide hamburger menu on desktop since sidebar is always visible */
+@media (min-width: 768px) {
+  .menu-button {
+    display: none !important;
+  }
+}

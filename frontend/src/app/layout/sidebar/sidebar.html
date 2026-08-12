@@ -1,0 +1,31 @@
+<div class="sidebar-container">
+  <!-- Logo Section -->
+  <div class="logo-section">
+    <mat-icon class="logo-icon text-primary">account_tree</mat-icon>
+    <span class="logo-text">LDAP Console</span>
+  </div>
+
+  <!-- Navigation -->
+  <mat-nav-list class="nav-list">
+    @for (item of menuItems; track item.path) {
+      <a mat-list-item [routerLink]="item.path" routerLinkActive="active-link" (click)="navigate.emit()">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <div matListItemTitle class="nav-label">{{ item.label }}</div>
+      </a>
+    }
+  </mat-nav-list>
+
+  <div class="spacer"></div>
+
+  <!-- Footer Actions -->
+  <mat-nav-list class="footer-list">
+    <a mat-list-item (click)="toggleTheme()">
+      <mat-icon matListItemIcon>{{ isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      <div matListItemTitle class="nav-label">{{ isDark ? 'Modo Claro' : 'Modo Oscuro' }}</div>
+    </a>
+    <a mat-list-item class="logout-btn">
+      <mat-icon matListItemIcon class="text-danger">logout</mat-icon>
+      <div matListItemTitle class="nav-label text-danger">Cerrar Sesión</div>
+    </a>
+  </mat-nav-list>
+</div>

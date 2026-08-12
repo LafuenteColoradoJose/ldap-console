@@ -1,0 +1,33 @@
+.app-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.app-sidenav {
+  /* En escritorio, el ancho lo controla el componente sidebar con su hover.
+     En móvil, le damos un ancho fijo al contenedor */
+  overflow: hidden;
+  background: transparent;
+  border-right: none;
+}
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-body {
+  padding: 24px;
+  flex: 1;
+  overflow: auto;
+}
+
+/* En móvil el sidenav se auto-ajusta, pero evitamos que el hover cause rarezas */
+@media (max-width: 767px) {
+  .app-sidenav {
+    width: 256px;
+  }
+}

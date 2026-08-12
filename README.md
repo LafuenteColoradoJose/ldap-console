@@ -8,7 +8,7 @@ El proyecto está estructurado como un **Monorepo** basado en una metodología *
 
 1. **Infraestructura (Docker):** Controlador de Dominio Active Directory utilizando la imagen de `nowsci/samba-domain`. Es la única fuente de verdad (sin bases de datos adicionales).
 2. **Backend (Node.js + TypeScript):** Una API REST *stateless* construida con Express y `ldapjs` para interactuar con el directorio de manera nativa.
-3. **Frontend (Angular + Ionic):** Una SPA (*Single Page Application*) responsiva (Web y Mobile) (En desarrollo).
+3. **Frontend (Angular):** Una SPA (*Single Page Application*) responsiva con **Angular Material** y preparada para integrar *Angular Agent Skills*.
 
 ---
 
@@ -76,8 +76,16 @@ curl http://localhost:3000/api/status
 ```
 > **Importante:** El backend utiliza el protocolo **LDAPS seguro (puerto 636)** ya que Samba4, por defecto, exige cifrado (*Strong Auth Required*) para autenticar usuarios con contraseñas. Para el entorno de desarrollo local, el backend está configurado para aceptar certificados autofirmados (`rejectUnauthorized: false`).
 
-### 5. Frontend (Próximamente)
-La interfaz web y móvil construida en Ionic/Angular estará ubicada en la carpeta `/frontend`.
+### 5. Ejecutar el Frontend
+La interfaz de usuario está desarrollada en Angular con Angular Material y SCSS puro (efectos de hover *Eye of Medina*).
+
+```bash
+cd frontend
+npm install
+npm run start
+```
+
+La aplicación web estará disponible en `http://localhost:4200/`.
 
 ---
 
