@@ -35,6 +35,30 @@ Se ha migrado de las herramientas antiguas (Karma/Jasmine) al nuevo ecosistema d
 
 *Comando para ejecución:* `npm run test -- --no-watch`
 
+### Ejemplos Vivos (TDD en Backend)
+Fieles a la metodología de **TDD como Documentación**, las operaciones del Directorio Activo se prueban mediante E2E contra el contenedor Samba4 real. Estos archivos sirven de guía de uso.
+
+**Crear un Usuario (Extraído de `usuario-test.spec.ts`):**
+```typescript
+// 1. Asegurar que no existe
+let user = await UserService.findUser('usuario-test');
+
+// 2. Crear usuario a través del servicio
+await UserService.createUser('usuario-test', 'Usuario', 'DePrueba', 'test@corp.local');
+
+// 3. Buscar para validar su creación
+user = await UserService.findUser('usuario-test');
+```
+
+**Crear un Grupo (Extraído de `grupo-test.spec.ts`):**
+```typescript
+// 1. Crear el grupo usando el servicio (sAMAccountName)
+await GroupService.createGroup('grupo-test', 'Grupo de pruebas automatizadas E2E');
+
+// 2. Validar
+let group = await GroupService.findGroup('grupo-test');
+```
+
 ## 🔒 Flujo de Autenticación
 
 1.  El Frontend envía credenciales a `/api/auth/login`.
