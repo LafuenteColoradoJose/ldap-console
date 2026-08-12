@@ -1,5 +1,5 @@
-<mat-sidenav-container class="app-container">
-  
+<!-- LAYOUT DE LA APLICACIÓN (LOGUEADO) -->
+<mat-sidenav-container class="app-container" *ngIf="isLoggedIn()">
   <mat-sidenav 
     #sidenav 
     [mode]="isMobile ? 'over' : 'side'" 
@@ -13,7 +13,6 @@
 
   <mat-sidenav-content class="app-content">
     
-    <!-- El Header es visible principalmente en móvil para el botón de menú -->
     <app-header (toggleMenu)="sidenav.toggle()"></app-header>
     
     <main class="main-body">
@@ -21,5 +20,9 @@
     </main>
     
   </mat-sidenav-content>
-
 </mat-sidenav-container>
+
+<!-- PANTALLA COMPLETA (LOGIN) -->
+<ng-container *ngIf="!isLoggedIn()">
+  <router-outlet></router-outlet>
+</ng-container>

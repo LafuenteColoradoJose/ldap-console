@@ -1,0 +1,48 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div class="logo-container">
+        <mat-icon class="logo-icon text-primary">account_tree</mat-icon>
+      </div>
+      <mat-card-title>Iniciar Sesión</mat-card-title>
+      <mat-card-subtitle>LDAP Console</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Mensaje de Error (Accessible) -->
+        <div class="error-message" *ngIf="errorMessage()" role="alert" aria-live="assertive">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Usuario (ej: admin@corp.local)</mat-label>
+          <input matInput formControlName="username" required aria-required="true">
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            El nombre de usuario es obligatorio
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" required aria-required="true">
+          <button mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePassword()" type="button">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            La contraseña es obligatoria
+          </mat-error>
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-flat-button color="primary" type="submit" class="submit-btn" [disabled]="loginForm.invalid || isLoading()">
+            <mat-spinner diameter="24" *ngIf="isLoading()"></mat-spinner>
+            <span *ngIf="!isLoading()">Entrar</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

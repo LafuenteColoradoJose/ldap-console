@@ -1,18 +1,21 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Sidebar } from './layout/sidebar/sidebar';
 import { Header } from './layout/header/header';
+import { Auth } from './core/services/auth';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MatSidenavModule, Sidebar, Header],
+  imports: [RouterOutlet, CommonModule, MatSidenavModule, Sidebar, Header],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
   title = 'LDAP console';
+  authService = inject(Auth);
   
   isMobile = false;
   sidebarOpen = false; // Solo se usa en móvil para abrir/cerrar
@@ -44,5 +47,9 @@ export class App implements OnInit {
     if (this.isMobile) {
       this.sidebarOpen = false;
     }
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 }

@@ -2,6 +2,10 @@
 
 **LDAP Console** es una alternativa moderna, de nueva generación y *mobile-first* a herramientas clásicas como phpLDAPadmin. Su propósito es proveer una interfaz sencilla y potente para gestionar usuarios, grupos, equipos y Políticas de Grupo (GPOs) de un dominio de Active Directory (Samba4).
 
+📚 **Documentación detallada:**
+* [Manual de Usuario](./manual-de-usuario.md)
+* [Manual Técnico](./manual-tecnico.md)
+
 ## 🏛️ Arquitectura del Proyecto
 
 El proyecto está estructurado como un **Monorepo** basado en una metodología *12-Factor App*, compuesto por tres capas principales:
@@ -86,6 +90,18 @@ npm run start
 ```
 
 La aplicación web estará disponible en `http://localhost:4200/`.
+
+### 6. Ejecutar las Pruebas Unitarias (Testing)
+El frontend de Angular está configurado con **Vitest nativo** y el motor de cobertura V8. Para ejecutar los tests interactivos:
+
+```bash
+cd frontend
+npm run test
+```
+Para ejecutar los tests de una sola vez y visualizar el informe de cobertura HTML (generado en `frontend/coverage/index.html`):
+```bash
+npm run test -- --no-watch
+```
 
 ---
 

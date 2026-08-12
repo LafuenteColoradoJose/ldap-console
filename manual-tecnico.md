@@ -1,0 +1,45 @@
+# Manual Técnico - LDAP Console
+
+Este documento describe la arquitectura interna, decisiones de diseño y stack tecnológico utilizado en el desarrollo de la aplicación LDAP Console.
+
+## 🏗 Arquitectura del Sistema
+
+El proyecto sigue un enfoque **Monorepo**, separando claramente las responsabilidades en capas:
+
+1.  **Infraestructura (Capa de Datos)**
+    *   **Contenedor Docker (`nowsci/samba-domain`)**: Actúa como Controlador de Dominio de Active Directory completo basado en Samba4.
+    *   **Volúmenes**: Utiliza volúmenes persistentes y privilegios elevados para gestionar los *Extended Attributes* (xattr) y *Access Control Lists* (ACL) de los sistemas de archivos (necesario para GPOs y SYSVOL).
+
+2.  **Backend (Capa de Lógica / API)**
+    *   **Stack**: Node.js (v18+) + Express + TypeScript.
+    *   **LDAP Client**: Se comunica directamente con el contenedor del AD utilizando la librería `ldapjs`.
+    *   **Seguridad**:
+        *   Las peticiones internas al AD se realizan obligatoriamente mediante **LDAPS (puerto 636)**. Samba4 requiere conexiones seguras para operaciones sensibles (como autenticación por contraseña).
+        *   La API REST emite un **JSON Web Token (JWT)** al autenticarse exitosamente, el cual es utilizado de forma *stateless* por el frontend.
+
+3.  **Frontend (Capa de Presentación)**
+    *   **Stack**: Angular 22 (Standalone Components) + Angular Material.
+    *   **Diseño**: Mobile-first, implementando SCSS puro para efectos de transiciones (inspirado en el patrón *Eye of Medina* para el Sidebar).
+    *   **Gestión de Estado**: Utiliza **Angular Signals** (ej. `computed`, `signal`) para el estado reactivo, reemplazando a RxJS donde el flujo es síncrono o dependiente de estado local (como el estado de Autenticación).
+
+## 🧪 Estrategia de Testing (Frontend)
+
+Se ha migrado de las herramientas antiguas (Karma/Jasmine) al nuevo ecosistema de Angular:
+
+*   **Test Runner**: **Vitest** + JSDOM integrado nativamente a través del builder oficial de Angular 22 (`@angular/build:unit-test`).
+*   **Cobertura**: Gestionada a través del motor **V8**, configurado directamente en `angular.json` (`"coverage": true`).
+*   **Aislamiento**:
+    *   El enrutador se mockea utilizando `provideRouter([])`.
+    *   El cliente HTTP se intercepta mediante `HttpTestingController` y `provideHttpClientTesting()`.
+    *   **Mocks de Entorno**: Se utilizan polyfills para inyectar APIs del navegador (`window.matchMedia`) necesarias para Angular Material.
+
+*Comando para ejecución:* `npm run test -- --no-watch`
+
+## 🔒 Flujo de Autenticación
+
+1.  El Frontend envía credenciales a `/api/auth/login`.
+2.  El Backend realiza un *LDAP Bind* hacia el servidor Samba4 por LDAPS.
+3.  Si el Bind es exitoso, el Backend firma un JWT y lo devuelve al Frontend.
+4.  El Frontend almacena el JWT en el `localStorage` y levanta una *Signal* de sesión.
+5.  Los **Angular Route Guards** (`authGuard`) bloquean el acceso a las rutas protegidas a nivel del cliente (comprobando la existencia del token o redirigiendo generando un `UrlTree`).
+*(Pendiente: Implementar HttpInterceptor para securizar las llamadas salientes)*.
