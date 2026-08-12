@@ -5,10 +5,10 @@ import ldap from 'ldapjs';
 import path from 'path';
 
 // Carga las variables de entorno desde el archivo .env en la raíz del proyecto
+// En un entorno de testing, podemos querer mockear esto
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const app = express();
-const PORT = process.env.API_PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -22,6 +22,9 @@ const bindDN = `administrator@${AD_DOMAIN}`;
 const bindPassword = AD_PASSWORD;
 const ldapUrl = 'ldaps://127.0.0.1:636';
 
+/**
+ * Endpoint de estado para comprobar la conectividad con el servidor LDAP local
+ */
 app.get('/api/status', (req: Request, res: Response) => {
   const client = ldap.createClient({
     url: ldapUrl,
@@ -56,7 +59,4 @@ app.get('/api/status', (req: Request, res: Response) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor Backend corriendo en http://localhost:${PORT}`);
-  console.log(`Prueba el endpoint de estado en: http://localhost:${PORT}/api/status`);
-});
+export default app;
