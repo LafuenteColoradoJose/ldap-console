@@ -71,4 +71,21 @@ export class UserService {
       });
     });
   }
+
+  /**
+   * Obtiene todos los usuarios.
+   */
+  static async getAllUsers(): Promise<any[]> {
+    const client = await getAdminClient();
+    try {
+      const entries = await searchLdap(client, this.USERS_BASE_DN, {
+        scope: 'sub',
+        filter: '(objectClass=user)',
+        attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn']
+      });
+      return entries;
+    } finally {
+      client.unbind();
+    }
+  }
 }

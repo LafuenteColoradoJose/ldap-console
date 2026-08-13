@@ -17,6 +17,15 @@ export class UserController {
     }
   }
 
+  static async getAllUsers(req: Request, res: Response): Promise<any> {
+    try {
+      const users = await UserService.getAllUsers();
+      return res.json({ status: 'success', data: users });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+
   static async createUser(req: Request, res: Response): Promise<any> {
     try {
       const { username, firstName, lastName, email } = req.body;

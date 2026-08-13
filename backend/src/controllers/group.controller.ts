@@ -17,6 +17,15 @@ export class GroupController {
     }
   }
 
+  static async getAllGroups(req: Request, res: Response): Promise<any> {
+    try {
+      const groups = await GroupService.getAllGroups();
+      return res.json({ status: 'success', data: groups });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+
   static async createGroup(req: Request, res: Response): Promise<any> {
     try {
       const { name, description } = req.body;

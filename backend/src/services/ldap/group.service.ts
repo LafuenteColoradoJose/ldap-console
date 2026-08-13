@@ -67,4 +67,21 @@ export class GroupService {
       client.unbind();
     }
   }
+
+  /**
+   * Obtiene todos los grupos del sistema.
+   */
+  static async getAllGroups(): Promise<any[]> {
+    const client = await getAdminClient();
+    try {
+      const entries = await searchLdap(client, this.GROUPS_BASE_DN, {
+        scope: 'sub',
+        filter: '(objectClass=group)',
+        attributes: ['sAMAccountName', 'description', 'member']
+      });
+      return entries;
+    } finally {
+      client.unbind();
+    }
+  }
 }
