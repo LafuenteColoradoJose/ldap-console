@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/services/user.service';
 import { MatTableModule } from '@angular/material/table';
@@ -24,6 +24,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class Users implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   users: any[] = [];
   displayedColumns: string[] = ['name', 'username', 'email', 'status', 'actions'];
@@ -37,13 +38,15 @@ export class Users implements OnInit {
     this.loading = true;
     this.userService.getAllUsers().subscribe({
       next: (data) => {
-        this.users = data;
+        this.users = data || [];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.showToast('Error al cargar usuarios');
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -70,6 +73,26 @@ export class Users implements OnInit {
         console.error(err);
         this.showToast(`Error al crear: ${err.error?.message || err.message}`);
         this.loading = false;
+      }
+    });
+  }
+
+  toggleStatus(user: any) {
+    const cn = this.getUserValue(user, 'cn');
+    const currentlyDisabled = this.isUserDisabled(user);
+    const willEnable = currentlyDisabled;
+
+    this.loading = true;
+    this.userService.toggleUserStatus(cn, willEnable).subscribe({
+      next: () => {
+        this.showToast(`Usuario ${willEnable ? 'habilitado' : 'deshabilitado'}.`);
+        this.fetchUsers();
+      },
+      error: (err) => {
+        console.error(err);
+        this.showToast(`Error: ${err.error?.message || err.message}`);
+        this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

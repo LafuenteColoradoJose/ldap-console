@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomainService } from '../../core/services/domain.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-domain',
@@ -14,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class Domain implements OnInit {
   private domainService = inject(DomainService);
+  private cdr = inject(ChangeDetectorRef);
   
   domainInfo: any = null;
   domainStructure: any[] = [];
@@ -24,34 +26,23 @@ export class Domain implements OnInit {
   }
 
   fetchData() {
-    // Podríamos usar forkJoin, pero para mantenerlo simple hacemos dos llamadas
-    this.domainService.getDomainInfo().subscribe({
-      next: (info) => {
-        this.domainInfo = info;
-        this.checkLoading();
+    this.loading = true;
+    forkJoin({
+      info: this.domainService.getDomainInfo(),
+      structure: this.domainService.getDomainStructure()
+    }).subscribe({
+      next: (result) => {
+        this.domainInfo = result.info;
+        this.domainStructure = result.structure || [];
+        this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error info:', err);
-        this.checkLoading();
+        console.error('Error fetching domain data:', err);
+        this.loading = false;
+        this.cdr.detectChanges();
       }
     });
-
-    this.domainService.getDomainStructure().subscribe({
-      next: (structure) => {
-        this.domainStructure = structure;
-        this.checkLoading();
-      },
-      error: (err) => {
-        console.error('Error structure:', err);
-        this.checkLoading();
-      }
-    });
-  }
-
-  checkLoading() {
-    if (this.domainInfo && this.domainStructure.length > 0) {
-      this.loading = false;
-    }
   }
 
   getIconForClass(entry: any): string {
@@ -63,6 +54,6 @@ export class Domain implements OnInit {
 
   getName(entry: any): string {
     const nameAttr = entry.attributes?.find((a: any) => a.type === 'name');
-    return nameAttr ? nameAttr.values[0] : entry.objectName;
+    return nameAttr && nameAttr.values ? nameAttr.values[0] : entry.objectName;
   }
 }

@@ -49,4 +49,15 @@ export class UserController {
       return res.status(500).json({ status: 'error', message: error.message });
     }
   }
+
+  static async toggleUserStatus(req: Request, res: Response): Promise<any> {
+    try {
+      const { cn } = req.params;
+      const { enable } = req.body;
+      await UserService.toggleUserStatus(cn, enable);
+      return res.json({ status: 'success', message: `Usuario ${enable ? 'habilitado' : 'deshabilitado'}.` });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
 }

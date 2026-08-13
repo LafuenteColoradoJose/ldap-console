@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GroupService } from '../../core/services/group.service';
 import { MatTableModule } from '@angular/material/table';
@@ -24,6 +24,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class Groups implements OnInit {
   private groupService = inject(GroupService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   groups: any[] = [];
   displayedColumns: string[] = ['name', 'description', 'actions'];
@@ -37,13 +38,15 @@ export class Groups implements OnInit {
     this.loading = true;
     this.groupService.getAllGroups().subscribe({
       next: (data) => {
-        this.groups = data;
+        this.groups = data || [];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
         this.showToast('Error al cargar grupos');
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

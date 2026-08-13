@@ -23,6 +23,7 @@ router.delete('/groups/:name', GroupController.deleteGroup);
 router.get('/users', UserController.getAllUsers);
 router.get('/users/:username', UserController.getUser);
 router.post('/users', UserController.createUser);
+router.put('/users/:cn/status', UserController.toggleUserStatus);
 router.delete('/users/:cn', UserController.deleteUser);
 
 export default router;

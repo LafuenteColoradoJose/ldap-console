@@ -25,6 +25,10 @@ export class UserService {
     return this.http.post<any>(this.apiUrl, { username, firstName, lastName, email });
   }
 
+  toggleUserStatus(cn: string, enable: boolean): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${cn}/status`, { enable });
+  }
+
   deleteUser(cn: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${cn}`);
   }

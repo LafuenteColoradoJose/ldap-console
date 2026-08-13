@@ -88,4 +88,30 @@ export class UserService {
       client.unbind();
     }
   }
+
+  /**
+   * Habilita o deshabilita un usuario cambiando su userAccountControl
+   */
+  static async toggleUserStatus(cn: string, enable: boolean): Promise<void> {
+    const client = await getAdminClient();
+    return new Promise((resolve, reject) => {
+      const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
+      // 544: Normal (512) + PassNotReq (32). 
+      // 546: Normal (512) + Disabled (2) + PassNotReq (32).
+      const uacValue = enable ? '544' : '546';
+      
+      const change = new ldap.Change({
+        operation: 'replace',
+        modification: {
+          userAccountControl: uacValue
+        }
+      });
+
+      client.modify(userDN, change, (err) => {
+        client.unbind();
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
 }
