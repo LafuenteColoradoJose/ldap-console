@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GroupDialog } from './group-dialog';
+import { MembersDialog } from './members-dialog';
 
 @Component({
   selector: 'app-groups',
@@ -126,8 +127,23 @@ export class Groups implements OnInit {
     this.snackBar.open(message, 'Cerrar', { duration: 3000 });
   }
 
-  getGroupValue(group: any, attr: string): string {
-    const attribute = group.attributes?.find((a: any) => a.type === attr);
-    return attribute ? attribute.values[0] : '';
+  openMembersDialog(group: any) {
+    const groupName = this.getGroupValue(group, 'sAMAccountName');
+    const members = this.getGroupValue(group, 'member', true);
+    
+    const dialogRef = this.dialog.open(MembersDialog, {
+      width: '500px',
+      data: { groupName, members }
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.fetchGroups();
+    });
+  }
+
+  getGroupValue(group: any, key: string, allValues = false): any {
+    const attr = group.attributes?.find((a: any) => a.type === key);
+    if (!attr || !attr.values) return allValues ? [] : '';
+    return allValues ? attr.values : (attr.values[0] || '');
   }
 }

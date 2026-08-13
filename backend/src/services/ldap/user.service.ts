@@ -81,7 +81,7 @@ export class UserService {
       const entries = await searchLdap(client, this.USERS_BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=user)',
-        attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn']
+        attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn', 'memberOf']
       });
       return entries;
     } finally {

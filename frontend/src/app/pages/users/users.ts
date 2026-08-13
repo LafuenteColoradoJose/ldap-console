@@ -10,6 +10,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserDialog } from './user-dialog';
+import { UserGroupsDialog } from './user-groups-dialog';
 
 @Component({
   selector: 'app-users',
@@ -154,9 +155,32 @@ export class Users implements OnInit {
     this.snackBar.open(message, 'Cerrar', { duration: 3000 });
   }
 
-  getUserValue(user: any, attr: string): string {
-    const attribute = user.attributes?.find((a: any) => a.type === attr);
-    return attribute ? attribute.values[0] : '';
+  openUserGroupsDialog(user: any) {
+    const gn = this.getUserValue(user, 'givenName');
+    const sn = this.getUserValue(user, 'sn');
+    const cn = this.getUserValue(user, 'cn');
+    const userName = gn || sn ? (gn + ' ' + sn).trim() : cn;
+    
+    const rawGroups = this.getUserValue(user, 'memberOf', true);
+    let groupsArray: string[] = [];
+    if (rawGroups && rawGroups.length > 0) {
+      const arr = Array.isArray(rawGroups) ? rawGroups : [rawGroups];
+      groupsArray = arr.map((dn: string) => {
+        const match = dn.match(/CN=([^,]+)/i);
+        return match ? match[1] : dn;
+      });
+    }
+
+    this.dialog.open(UserGroupsDialog, {
+      width: '450px',
+      data: { userName, groups: groupsArray }
+    });
+  }
+
+  getUserValue(user: any, key: string, allValues = false): any {
+    const attr = user.attributes?.find((a: any) => a.type === key);
+    if (!attr || !attr.values) return allValues ? [] : '';
+    return allValues ? attr.values : (attr.values[0] || '');
   }
 
   isUserDisabled(user: any): boolean {

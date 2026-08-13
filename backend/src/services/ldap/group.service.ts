@@ -104,4 +104,61 @@ export class GroupService {
       });
     });
   }
+
+  /**
+   * Añade un usuario a un grupo
+   */
+  static async addMember(groupName: string, memberCN: string): Promise<void> {
+    const client = await getAdminClient();
+    return new Promise((resolve, reject) => {
+      const groupDN = `CN=${groupName},${this.GROUPS_BASE_DN}`;
+      // Usamos el mismo BASE_DN que los usuarios (CN=Users)
+      const memberDN = `CN=${memberCN},CN=Users,${BASE_DN}`; 
+
+      const change = new ldap.Change({
+        operation: 'add',
+        modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+      });
+
+      client.modify(groupDN, change, (err) => {
+        client.unbind();
+        if (err) {
+          // Si ya existe (error 68: Entry Already Exists), lo damos por válido
+          if (err.name === 'EntryAlreadyExistsError' || err.code === 68) {
+            return resolve();
+          }
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * Elimina un usuario de un grupo
+   */
+  static async removeMember(groupName: string, memberCN: string): Promise<void> {
+    const client = await getAdminClient();
+    return new Promise((resolve, reject) => {
+      const groupDN = `CN=${groupName},${this.GROUPS_BASE_DN}`;
+      const memberDN = `CN=${memberCN},CN=Users,${BASE_DN}`;
+
+      const change = new ldap.Change({
+        operation: 'delete',
+        modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+      });
+
+      client.modify(groupDN, change, (err) => {
+        client.unbind();
+        if (err) {
+          // Si no existe el miembro (error 16: No Such Attribute), lo damos por válido
+          if (err.name === 'NoSuchAttributeError' || err.code === 16) {
+            return resolve();
+          }
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  }
 }

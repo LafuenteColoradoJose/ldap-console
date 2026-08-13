@@ -19,6 +19,8 @@ router.get('/groups/:name', GroupController.getGroup);
 router.post('/groups', GroupController.createGroup);
 router.put('/groups/:name', GroupController.updateGroup);
 router.delete('/groups/:name', GroupController.deleteGroup);
+router.post('/groups/:name/members', GroupController.addMember);
+router.delete('/groups/:name/members/:memberCn', GroupController.removeMember);
 
 // --- Rutas de Usuarios ---
 router.get('/users', UserController.getAllUsers);

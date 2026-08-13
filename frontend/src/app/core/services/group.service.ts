@@ -31,6 +31,14 @@ export class GroupService {
   }
 
   deleteGroup(name: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${name}`);
+    return this.http.delete<any>(`${this.apiUrl}/${encodeURIComponent(name)}`);
+  }
+
+  addMember(name: string, memberCN: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${encodeURIComponent(name)}/members`, { memberCN });
+  }
+
+  removeMember(name: string, memberCN: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${encodeURIComponent(name)}/members/${encodeURIComponent(memberCN)}`);
   }
 }

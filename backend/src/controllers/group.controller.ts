@@ -60,4 +60,25 @@ export class GroupController {
       return res.status(500).json({ status: 'error', message: error.message });
     }
   }
+
+  static async addMember(req: Request, res: Response): Promise<any> {
+    try {
+      const { name } = req.params;
+      const { memberCN } = req.body;
+      await GroupService.addMember(name, memberCN);
+      return res.json({ status: 'success', message: 'Miembro añadido correctamente.' });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+
+  static async removeMember(req: Request, res: Response): Promise<any> {
+    try {
+      const { name, memberCn } = req.params;
+      await GroupService.removeMember(name, memberCn);
+      return res.json({ status: 'success', message: 'Miembro eliminado correctamente.' });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
 }
