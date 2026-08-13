@@ -19,6 +19,7 @@ export class Sidebar {
 
   menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/domain', label: 'Dominio', icon: 'account_tree' },
     { path: '/users', label: 'Usuarios', icon: 'group' },
     { path: '/groups', label: 'Grupos', icon: 'groups' },
     { path: '/machines', label: 'Equipos', icon: 'computer' },

@@ -9,6 +9,12 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:3000/api/users';
 
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => response.data)
+    );
+  }
+
   getUser(username: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${username}`).pipe(
       map(response => response.data)

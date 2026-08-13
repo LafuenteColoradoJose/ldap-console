@@ -1,0 +1,132 @@
+.page-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    
+    .header-icon {
+      font-size: 3rem;
+      height: 3rem;
+      width: 3rem;
+      background: rgba(var(--primary-color-rgb), 0.1);
+      border-radius: 12px;
+      padding: 0.5rem;
+    }
+    
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-color);
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+  }
+
+  .create-btn {
+    border-radius: 8px;
+    padding: 0 1.5rem;
+    height: 44px;
+    font-weight: 500;
+  }
+}
+
+.table-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--surface-color-rgb), 0.7);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.full-width-table {
+  width: 100%;
+  background: transparent;
+  
+  th.mat-header-cell {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem;
+  }
+  
+  td.mat-cell {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+  }
+
+  .hover-row {
+    transition: background-color 0.2s ease;
+    &:hover {
+      background-color: rgba(var(--primary-color-rgb), 0.04);
+    }
+  }
+}
+
+.td-icon-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.8;
+  }
+}
+
+.text-right {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.empty-cell {
+  text-align: center;
+  padding: 3rem !important;
+  color: var(--text-secondary) !important;
+  font-style: italic;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

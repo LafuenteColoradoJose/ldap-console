@@ -1,0 +1,53 @@
+<div class="page-container fade-in">
+  <div class="page-header">
+    <div class="header-content">
+      <mat-icon class="header-icon text-primary">account_tree</mat-icon>
+      <div>
+        <h1>Estructura del Dominio</h1>
+        <p class="subtitle">Explora las Unidades Organizativas (OUs) y contenedores principales.</p>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Consultando Active Directory...</p>
+    </div>
+  } @else {
+    <div class="domain-grid">
+      <!-- Info Card -->
+      <mat-card class="glass-card domain-info-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="text-primary">language</mat-icon>
+          <mat-card-title>Raíz del Dominio</mat-card-title>
+          <mat-card-subtitle>{{ domainInfo?.objectName }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <mat-icon>dns</mat-icon>
+            <span>Clase: <strong>domain</strong></span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Structure Tree -->
+      <div class="structure-list">
+        <h3>Contenedores Principales</h3>
+        <div class="tree-container">
+          @for (entry of domainStructure; track entry.objectName) {
+            <mat-card class="glass-card tree-node">
+              <div class="node-content">
+                <mat-icon class="node-icon">{{ getIconForClass(entry) }}</mat-icon>
+                <div class="node-details">
+                  <div class="node-name">{{ getName(entry) }}</div>
+                  <div class="node-dn">{{ entry.objectName }}</div>
+                </div>
+              </div>
+            </mat-card>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
