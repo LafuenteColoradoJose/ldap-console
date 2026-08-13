@@ -10,8 +10,8 @@ services:
       - OPTIONS=--use-rfc2307
     ports:
       # DNS (Comentar en Linux de escritorio si el puerto 53 da error)
-      # - "53:53/tcp"
-      # - "53:53/udp"
+      - "192.168.1.142:53:53/tcp"
+      - "192.168.1.142:53:53/udp"
       - "88:88/tcp"
       - "88:88/udp"
       - "464:464/tcp"

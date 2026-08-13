@@ -7,11 +7,21 @@
 }
 
 .app-sidenav {
-  /* En escritorio, el ancho lo controla el componente sidebar con su hover.
-     En móvil, le damos un ancho fijo al contenedor */
-  overflow: hidden;
   background: transparent;
   border-right: none;
+  /* El ancho fijo evita que mat-sidenav empuje el contenido al hacer hover */
+  width: 80px;
+  overflow: visible !important; /* Permite que el hover se salga del sidenav */
+  
+  ::ng-deep .mat-drawer-inner-container {
+    overflow: visible !important;
+  }
+}
+
+/* Permitimos que app-sidebar sea bloque para que se adapte */
+app-sidebar {
+  display: block;
+  height: 100%;
 }
 
 .app-content {

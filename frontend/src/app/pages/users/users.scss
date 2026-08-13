@@ -1,7 +1,5 @@
 .page-container {
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 .page-header {
@@ -50,7 +48,7 @@
 .table-container {
   position: relative;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
   background: var(--surface-color);
   border: 1px solid var(--border-color);
 }
@@ -81,12 +79,14 @@
     letter-spacing: 0.5px;
     border-bottom: 1px solid var(--border-color);
     padding: 1rem;
+    white-space: nowrap;
   }
   
   td.mat-cell {
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
     color: var(--text-color);
+    white-space: nowrap;
   }
 
   .hover-row {

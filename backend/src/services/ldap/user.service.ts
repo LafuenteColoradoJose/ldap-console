@@ -12,25 +12,43 @@ export class UserService {
    * @param firstName Nombre (givenName)
    * @param lastName Apellido (sn)
    * @param email Correo electrónico (mail)
+   * @param password Contraseña opcional (en texto plano)
+   * @param forcePasswordChange Obligar a cambiar en el siguiente inicio de sesión
    */
-  static async createUser(username: string, firstName: string, lastName: string, email?: string): Promise<void> {
+  static async createUser(
+    username: string, 
+    firstName: string, 
+    lastName: string, 
+    email?: string,
+    password?: string,
+    forcePasswordChange: boolean = true
+  ): Promise<void> {
     const client = await getAdminClient();
     return new Promise((resolve, reject) => {
       const cn = `${firstName} ${lastName}`;
       const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
 
-      const entry = {
+      const entry: any = {
         objectClass: ['top', 'person', 'organizationalPerson', 'user'],
         sAMAccountName: username,
         givenName: firstName,
         sn: lastName,
         displayName: cn,
-        ...(email && { mail: email }),
-        userAccountControl: '512' // Cuenta Normal Activada (Requiere que las políticas de pass de Samba lo permitan, a veces falla sin password, por simplicidad para test usamos 546 que es deshabilitada si no pasamos password)
+        ...(email && { mail: email })
       };
 
-      // Si no proporcionamos contraseña, AD suele requerir que se cree deshabilitada
-      entry.userAccountControl = '546'; // 512 (Normal) + 2 (Deshabilitada) + 32 (Pass not required)
+      if (password) {
+        // La contraseña debe estar entre comillas y codificada en UTF-16LE para AD
+        entry.unicodePwd = Buffer.from(`"${password}"`, 'utf16le');
+        entry.userAccountControl = '512'; // Cuenta Normal Activada
+
+        if (forcePasswordChange) {
+          entry.pwdLastSet = '0';
+        }
+      } else {
+        // Si no proporcionamos contraseña, AD suele requerir que se cree deshabilitada
+        entry.userAccountControl = '546'; // 512 (Normal) + 2 (Deshabilitada) + 32 (Pass not required)
+      }
 
       client.add(userDN, entry, (err) => {
         client.unbind();
@@ -81,7 +99,7 @@ export class UserService {
       const entries = await searchLdap(client, this.USERS_BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=user)',
-        attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn', 'memberOf']
+        attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn', 'memberOf', 'lastLogon']
       });
       return entries;
     } finally {

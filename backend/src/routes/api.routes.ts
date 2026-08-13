@@ -3,6 +3,7 @@ import { requireAuth } from '../middlewares/auth.middleware';
 import { DomainController } from '../controllers/domain.controller';
 import { GroupController } from '../controllers/group.controller';
 import { UserController } from '../controllers/user.controller';
+import { ComputerController } from '../controllers/computer.controller';
 
 const router = Router();
 
@@ -29,5 +30,8 @@ router.post('/users', UserController.createUser);
 router.put('/users/:cn', UserController.updateUser);
 router.put('/users/:cn/status', UserController.toggleUserStatus);
 router.delete('/users/:cn', UserController.deleteUser);
+
+// --- Rutas de Equipos ---
+router.get('/computers', ComputerController.getAllComputers);
 
 export default router;

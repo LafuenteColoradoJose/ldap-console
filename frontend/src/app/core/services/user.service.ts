@@ -21,8 +21,8 @@ export class UserService {
     );
   }
 
-  createUser(username: string, firstName: string, lastName: string, email: string): Observable<any> {
-    return this.http.post<any>(this.apiUrl, { username, firstName, lastName, email });
+  createUser(username: string, firstName: string, lastName: string, email: string, password?: string, forcePasswordChange: boolean = true): Observable<any> {
+    return this.http.post<any>(this.apiUrl, { username, firstName, lastName, email, password, forcePasswordChange });
   }
 
   updateUser(cn: string, data: { firstName?: string, lastName?: string, email?: string }): Observable<any> {

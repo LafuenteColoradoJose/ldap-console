@@ -4,12 +4,13 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, FormsModule],
+  imports: [CommonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatCheckboxModule, FormsModule],
   template: `
     <h2 mat-dialog-title>{{ data.isEdit ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
     <mat-dialog-content>
@@ -30,6 +31,15 @@ import { FormsModule } from '@angular/forms';
           <mat-label>Correo Electrónico (mail)</mat-label>
           <input matInput [(ngModel)]="user.email" type="email">
         </mat-form-field>
+        <ng-container *ngIf="!data.isEdit">
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input matInput [(ngModel)]="user.password" type="password" required>
+          </mat-form-field>
+          <mat-checkbox [(ngModel)]="user.forcePasswordChange" color="primary">
+            Obligar al usuario a cambiar la contraseña en el siguiente inicio de sesión
+          </mat-checkbox>
+        </ng-container>
       </div>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
@@ -45,10 +55,15 @@ export class UserDialog {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.user = { ...data.user };
+    if (!this.data.isEdit) {
+      this.user.forcePasswordChange = true;
+    }
   }
 
   isValid() {
-    if (!this.data.isEdit && !this.user.username) return false;
+    if (!this.data.isEdit) {
+      if (!this.user.username || !this.user.password) return false;
+    }
     return !!this.user.firstName && !!this.user.lastName;
   }
 }

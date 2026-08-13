@@ -28,12 +28,12 @@ export class UserController {
 
   static async createUser(req: Request, res: Response): Promise<any> {
     try {
-      const { username, firstName, lastName, email } = req.body;
+      const { username, firstName, lastName, email, password, forcePasswordChange } = req.body;
       if (!username || !firstName || !lastName) {
         return res.status(400).json({ status: 'error', message: 'Faltan campos obligatorios (username, firstName, lastName).' });
       }
       
-      await UserService.createUser(username, firstName, lastName, email);
+      await UserService.createUser(username, firstName, lastName, email, password, forcePasswordChange);
       return res.status(201).json({ status: 'success', message: `Usuario ${username} creado exitosamente.` });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });

@@ -36,7 +36,7 @@ export class Users implements OnInit {
   private dialog = inject(MatDialog);
 
   users: any[] = [];
-  displayedColumns: string[] = ['name', 'username', 'email', 'status', 'actions'];
+  displayedColumns: string[] = ['name', 'username', 'email', 'lastLogon', 'status', 'actions'];
   loading = true;
 
   ngOnInit() {
@@ -97,14 +97,17 @@ export class Users implements OnInit {
             }
           });
         } else {
-          this.userService.createUser(result.username, result.firstName, result.lastName, result.email).subscribe({
+          this.userService.createUser(result.username, result.firstName, result.lastName, result.email, result.password, result.forcePasswordChange).subscribe({
             next: () => {
               this.showToast('Usuario aprovisionado correctamente');
               this.fetchUsers();
             },
             error: (err) => {
               console.error(err);
-              this.showToast('Error al aprovisionar usuario');
+              const msg = err.error?.message || err.message;
+              this.showToast(msg.includes('Constraint Violation') 
+                ? 'Error: La contraseña no cumple los requisitos mínimos de seguridad (complejidad/longitud).' 
+                : `Error al aprovisionar: ${msg}`);
               this.loading = false;
               this.cdr.detectChanges();
             }
@@ -189,5 +192,23 @@ export class Users implements OnInit {
     // Si (uac & 2) === 2, la cuenta está deshabilitada.
     const uacInt = parseInt(uac, 10);
     return !isNaN(uacInt) && (uacInt & 2) === 2;
+  }
+
+  formatLastLogon(user: any): string {
+    const lastLogon = this.getUserValue(user, 'lastLogon');
+    if (!lastLogon || lastLogon === '0') return 'Nunca';
+    
+    // lastLogon is Windows FileTime (100-nanosecond intervals since 1601-01-01)
+    const fileTime = parseInt(lastLogon, 10);
+    if (isNaN(fileTime)) return 'Desconocido';
+    
+    // Convert to JavaScript Date (milliseconds since 1970-01-01)
+    const jsTime = (fileTime / 10000) - 11644473600000;
+    const date = new Date(jsTime);
+    
+    return date.toLocaleString('es-ES', { 
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   }
 }

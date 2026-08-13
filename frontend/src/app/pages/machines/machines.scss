@@ -1,0 +1,51 @@
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+table {
+  width: 100%;
+  background: transparent;
+}
+
+.hover-row {
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: var(--surface-hover);
+  }
+}
+
+.os-info {
+  display: flex;
+  flex-direction: column;
+  
+  .os-name {
+    font-weight: 500;
+  }
+}
+
+.dns-name {
+  font-family: monospace;
+  background-color: var(--surface-hover);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 auto;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  
+  &.online {
+    background-color: #10b981; /* Tailwind emerald-500 */
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+  
+  &.offline {
+    background-color: #ef4444; /* Tailwind red-500 */
+  }
+}
