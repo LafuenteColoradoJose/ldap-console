@@ -26,6 +26,10 @@ export class GroupService {
     return this.http.post<any>(this.apiUrl, { name, description });
   }
 
+  updateGroup(name: string, description: string): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${name}`, { description });
+  }
+
   deleteGroup(name: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${name}`);
   }

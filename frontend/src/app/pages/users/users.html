@@ -7,10 +7,9 @@
         <p class="subtitle">Aprovisionamiento y administración de cuentas de usuario.</p>
       </div>
     </div>
-    <button mat-flat-button color="primary" class="create-btn" (click)="createUserDummy()">
-      <mat-icon>person_add</mat-icon>
-      Nuevo Usuario
-    </button>
+      <button mat-flat-button color="primary" (click)="openUserDialog()">
+        <mat-icon>person_add</mat-icon> Nuevo Usuario
+      </button>
   </div>
 
   <div class="table-container glass-card">
@@ -65,12 +64,20 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="text-right"> Acciones </th>
         <td mat-cell *matCellDef="let user" class="text-right">
-          <button mat-icon-button [color]="isUserDisabled(user) ? 'primary' : 'accent'" (click)="toggleStatus(user)" [title]="isUserDisabled(user) ? 'Habilitar Usuario' : 'Deshabilitar Usuario'">
-            <mat-icon>{{ isUserDisabled(user) ? 'play_arrow' : 'pause' }}</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="deleteUser(getUserValue(user, 'cn'))" title="Eliminar Usuario">
-            <mat-icon>person_remove</mat-icon>
-          </button>
+          <div class="action-buttons">
+            <button mat-icon-button color="primary" (click)="openUserDialog(user)" matTooltip="Editar Usuario">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <mat-slide-toggle 
+              [checked]="!isUserDisabled(user)" 
+              (change)="toggleStatus(user)"
+              color="primary"
+              matTooltip="Habilitar / Deshabilitar">
+            </mat-slide-toggle>
+            <button mat-icon-button color="warn" (click)="deleteUser(getUserValue(user, 'cn'))" matTooltip="Eliminar Usuario">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
         </td>
       </ng-container>
 

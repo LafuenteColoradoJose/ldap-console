@@ -115,6 +115,13 @@
   justify-content: flex-end;
 }
 
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
 .empty-cell {
   text-align: center;
   padding: 3rem !important;

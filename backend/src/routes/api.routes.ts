@@ -17,12 +17,14 @@ router.get('/domain/structure', DomainController.getStructure);
 router.get('/groups', GroupController.getAllGroups);
 router.get('/groups/:name', GroupController.getGroup);
 router.post('/groups', GroupController.createGroup);
+router.put('/groups/:name', GroupController.updateGroup);
 router.delete('/groups/:name', GroupController.deleteGroup);
 
 // --- Rutas de Usuarios ---
 router.get('/users', UserController.getAllUsers);
 router.get('/users/:username', UserController.getUser);
 router.post('/users', UserController.createUser);
+router.put('/users/:cn', UserController.updateUser);
 router.put('/users/:cn/status', UserController.toggleUserStatus);
 router.delete('/users/:cn', UserController.deleteUser);
 

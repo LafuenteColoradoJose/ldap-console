@@ -102,12 +102,45 @@ export class UserService {
       
       const change = new ldap.Change({
         operation: 'replace',
-        modification: {
-          userAccountControl: uacValue
-        }
+        modification: new ldap.Attribute({
+          type: 'userAccountControl',
+          vals: [uacValue]
+        })
       });
 
       client.modify(userDN, change, (err) => {
+        client.unbind();
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * Actualiza los datos de un usuario
+   */
+  static async updateUser(cn: string, data: { firstName?: string, lastName?: string, email?: string }): Promise<void> {
+    const client = await getAdminClient();
+    return new Promise((resolve, reject) => {
+      const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
+      
+      const modifications = [];
+      if (data.firstName !== undefined) {
+        modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'givenName', vals: [data.firstName] }) }));
+      }
+      if (data.lastName !== undefined) {
+        modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'sn', vals: [data.lastName] }) }));
+      }
+      if (data.email !== undefined) {
+        modifications.push(new ldap.Change({ operation: data.email ? 'replace' : 'delete', modification: new ldap.Attribute({ type: 'mail', vals: data.email ? [data.email] : [] }) }));
+      }
+
+      if (modifications.length === 0) {
+        client.unbind();
+        return resolve();
+      }
+
+      client.modify(userDN, modifications, (err) => {
         client.unbind();
         if (err) return reject(err);
         resolve();

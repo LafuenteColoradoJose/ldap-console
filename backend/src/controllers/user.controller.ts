@@ -60,4 +60,15 @@ export class UserController {
       return res.status(500).json({ status: 'error', message: error.message });
     }
   }
+
+  static async updateUser(req: Request, res: Response): Promise<any> {
+    try {
+      const { cn } = req.params;
+      const { firstName, lastName, email } = req.body;
+      await UserService.updateUser(cn, { firstName, lastName, email });
+      return res.json({ status: 'success', message: 'Usuario actualizado correctamente.' });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
 }

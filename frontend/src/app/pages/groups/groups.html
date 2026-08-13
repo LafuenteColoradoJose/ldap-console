@@ -7,10 +7,9 @@
         <p class="subtitle">Administra los grupos de seguridad del Directorio Activo.</p>
       </div>
     </div>
-    <button mat-flat-button color="primary" class="create-btn" (click)="createGroupDummy()">
-      <mat-icon>add</mat-icon>
-      Nuevo Grupo
-    </button>
+      <button mat-flat-button color="primary" (click)="openGroupDialog()">
+        <mat-icon>group_add</mat-icon> Nuevo Grupo
+      </button>
   </div>
 
   <div class="table-container glass-card">
@@ -45,9 +44,14 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="text-right"> Acciones </th>
         <td mat-cell *matCellDef="let group" class="text-right">
-          <button mat-icon-button color="warn" (click)="deleteGroup(getGroupValue(group, 'sAMAccountName'))" title="Eliminar Grupo">
-            <mat-icon>delete_outline</mat-icon>
-          </button>
+          <div class="action-buttons">
+            <button mat-icon-button color="primary" (click)="openGroupDialog(group)" matTooltip="Editar Grupo">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteGroup(getGroupValue(group, 'sAMAccountName'))" matTooltip="Eliminar Grupo">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
         </td>
       </ng-container>
 

@@ -84,4 +84,24 @@ export class GroupService {
       client.unbind();
     }
   }
+
+  /**
+   * Actualiza la descripción de un grupo
+   */
+  static async updateGroup(name: string, description: string): Promise<void> {
+    const client = await getAdminClient();
+    return new Promise((resolve, reject) => {
+      const groupDN = `CN=${name},${this.GROUPS_BASE_DN}`;
+      const change = new ldap.Change({
+        operation: description ? 'replace' : 'delete',
+        modification: new ldap.Attribute({ type: 'description', vals: description ? [description] : [] })
+      });
+
+      client.modify(groupDN, change, (err) => {
+        client.unbind();
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
 }

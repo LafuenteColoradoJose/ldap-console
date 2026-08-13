@@ -49,4 +49,15 @@ export class GroupController {
       return res.status(500).json({ status: 'error', message: error.message });
     }
   }
+
+  static async updateGroup(req: Request, res: Response): Promise<any> {
+    try {
+      const { name } = req.params;
+      const { description } = req.body;
+      await GroupService.updateGroup(name, description);
+      return res.json({ status: 'success', message: 'Grupo actualizado correctamente.' });
+    } catch (error: any) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
 }

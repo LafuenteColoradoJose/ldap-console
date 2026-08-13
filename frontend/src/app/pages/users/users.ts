@@ -6,6 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { UserDialog } from './user-dialog';
 
 @Component({
   selector: 'app-users',
@@ -16,7 +20,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule, 
     MatIconModule, 
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './users.html',
   styleUrl: './users.scss'
@@ -25,6 +32,7 @@ export class Users implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   users: any[] = [];
   displayedColumns: string[] = ['name', 'username', 'email', 'status', 'actions'];
@@ -51,28 +59,56 @@ export class Users implements OnInit {
     });
   }
 
-  createUserDummy() {
-    const username = prompt('Usuario (sAMAccountName):');
-    if (!username) return;
-    const firstName = prompt('Nombre:');
-    const lastName = prompt('Apellidos:');
-    const email = prompt('Correo electrónico (opcional):');
-    
-    if (!firstName || !lastName) {
-      this.showToast('Nombre y apellidos son obligatorios');
-      return;
-    }
+  openUserDialog(user?: any) {
+    const isEdit = !!user;
+    const dialogRef = this.dialog.open(UserDialog, {
+      width: '400px',
+      data: {
+        isEdit,
+        user: isEdit ? {
+          username: this.getUserValue(user, 'sAMAccountName'),
+          firstName: this.getUserValue(user, 'givenName'),
+          lastName: this.getUserValue(user, 'sn'),
+          email: this.getUserValue(user, 'mail')
+        } : { username: '', firstName: '', lastName: '', email: '' }
+      }
+    });
 
-    this.loading = true;
-    this.userService.createUser(username, firstName, lastName, email || '').subscribe({
-      next: () => {
-        this.showToast(`Usuario ${username} creado exitosamente.`);
-        this.fetchUsers();
-      },
-      error: (err) => {
-        console.error(err);
-        this.showToast(`Error al crear: ${err.error?.message || err.message}`);
-        this.loading = false;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loading = true;
+        if (isEdit) {
+          const cn = this.getUserValue(user, 'cn');
+          this.userService.updateUser(cn, {
+            firstName: result.firstName,
+            lastName: result.lastName,
+            email: result.email
+          }).subscribe({
+            next: () => {
+              this.showToast('Usuario actualizado correctamente');
+              this.fetchUsers();
+            },
+            error: (err) => {
+              console.error(err);
+              this.showToast('Error al actualizar usuario');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        } else {
+          this.userService.createUser(result.username, result.firstName, result.lastName, result.email).subscribe({
+            next: () => {
+              this.showToast('Usuario aprovisionado correctamente');
+              this.fetchUsers();
+            },
+            error: (err) => {
+              console.error(err);
+              this.showToast('Error al aprovisionar usuario');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        }
       }
     });
   }

@@ -6,6 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { GroupDialog } from './group-dialog';
 
 @Component({
   selector: 'app-groups',
@@ -16,7 +19,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule, 
     MatIconModule, 
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './groups.html',
   styleUrl: './groups.scss'
@@ -25,6 +30,7 @@ export class Groups implements OnInit {
   private groupService = inject(GroupService);
   private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   groups: any[] = [];
   displayedColumns: string[] = ['name', 'description', 'actions'];
@@ -51,21 +57,50 @@ export class Groups implements OnInit {
     });
   }
 
-  createGroupDummy() {
-    const name = prompt('Nombre del grupo (sAMAccountName):');
-    if (!name) return;
-    const desc = prompt('Descripción del grupo:');
-    
-    this.loading = true;
-    this.groupService.createGroup(name, desc || '').subscribe({
-      next: () => {
-        this.showToast(`Grupo ${name} creado exitosamente.`);
-        this.fetchGroups();
-      },
-      error: (err) => {
-        console.error(err);
-        this.showToast(`Error al crear el grupo: ${err.error?.message || err.message}`);
-        this.loading = false;
+  openGroupDialog(group?: any) {
+    const isEdit = !!group;
+    const dialogRef = this.dialog.open(GroupDialog, {
+      width: '400px',
+      data: {
+        isEdit,
+        group: isEdit ? {
+          name: this.getGroupValue(group, 'sAMAccountName'),
+          description: this.getGroupValue(group, 'description')
+        } : { name: '', description: '' }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loading = true;
+        if (isEdit) {
+          const name = this.getGroupValue(group, 'sAMAccountName');
+          this.groupService.updateGroup(name, result.description).subscribe({
+            next: () => {
+              this.showToast('Grupo actualizado correctamente');
+              this.fetchGroups();
+            },
+            error: (err) => {
+              console.error(err);
+              this.showToast('Error al actualizar grupo');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        } else {
+          this.groupService.createGroup(result.name, result.description).subscribe({
+            next: () => {
+              this.showToast('Grupo creado correctamente');
+              this.fetchGroups();
+            },
+            error: (err) => {
+              console.error(err);
+              this.showToast('Error al crear grupo');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        }
       }
     });
   }
