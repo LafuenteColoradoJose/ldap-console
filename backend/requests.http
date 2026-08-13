@@ -1,0 +1,31 @@
+### Variables globales
+@baseUrl = http://localhost:3000/api
+
+### 1. Hacer Login (Obtener Token)
+# Manda esta petición primero para obtener tu Token
+# @name loginRequest
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "administrator",
+  "password": "SuperSegura2026!"
+}
+
+### Extraer Token automáticamente en variable
+@authToken = {{loginRequest.response.body.token}}
+
+
+### 2. Probar Dominio (Requiere Token)
+GET {{baseUrl}}/domain/info
+Authorization: Bearer {{authToken}}
+
+
+### 3. Probar Estructura del Dominio
+GET {{baseUrl}}/domain/structure
+Authorization: Bearer {{authToken}}
+
+
+### 4. Consultar un usuario específico
+GET {{baseUrl}}/users/Administrator
+Authorization: Bearer {{authToken}}
