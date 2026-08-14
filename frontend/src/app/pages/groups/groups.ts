@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GroupDialog } from './group-dialog';
 import { MembersDialog } from './members-dialog';
+import { OuService } from '../../core/services/ou.service';
 
 @Component({
   selector: 'app-groups',
@@ -138,6 +139,44 @@ export class Groups implements OnInit {
 
     dialogRef.afterClosed().subscribe(() => {
       this.fetchGroups();
+    });
+  }
+
+  private ouService = inject(OuService);
+
+  openMoveDialog(group: any) {
+    const name = this.getGroupValue(group, 'sAMAccountName');
+    const currentDN = this.getGroupValue(group, 'distinguishedName') || `CN=${name},CN=Users,DC=corp,DC=local`;
+
+    import('../../shared/components/move-dialog/move-dialog').then(m => {
+      const dialogRef = this.dialog.open(m.MoveDialog, {
+        width: '400px',
+        data: { name, type: 'group', currentDN }
+      });
+
+      dialogRef.afterClosed().subscribe((selectedOU) => {
+        if (selectedOU) {
+          const newDN = `CN=${name},${selectedOU}`;
+          if (newDN.toLowerCase() === currentDN.toLowerCase()) {
+            this.showToast('El grupo ya se encuentra en esa ubicación');
+            return;
+          }
+
+          this.loading = true;
+          this.ouService.moveObject(currentDN, newDN).subscribe({
+            next: () => {
+              this.showToast('Grupo movido correctamente');
+              this.fetchGroups();
+            },
+            error: (err: any) => {
+              console.error(err);
+              this.showToast('Error al mover grupo');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        }
+      });
     });
   }
 

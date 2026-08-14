@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserDialog } from './user-dialog';
 import { UserGroupsDialog } from './user-groups-dialog';
+import { OuService } from '../../core/services/ou.service';
 
 @Component({
   selector: 'app-users',
@@ -177,6 +178,47 @@ export class Users implements OnInit {
     this.dialog.open(UserGroupsDialog, {
       width: '450px',
       data: { userName, groups: groupsArray }
+    });
+  }
+
+  private ouService = inject(OuService);
+
+  openMoveDialog(user: any) {
+    const cn = this.getUserValue(user, 'cn');
+    const gn = this.getUserValue(user, 'givenName');
+    const sn = this.getUserValue(user, 'sn');
+    const name = gn || sn ? (gn + ' ' + sn).trim() : cn;
+    const currentDN = this.getUserValue(user, 'distinguishedName') || `CN=${cn},CN=Users,DC=corp,DC=local`;
+
+    import('../../shared/components/move-dialog/move-dialog').then(m => {
+      const dialogRef = this.dialog.open(m.MoveDialog, {
+        width: '400px',
+        data: { name, type: 'user', currentDN }
+      });
+
+      dialogRef.afterClosed().subscribe((selectedOU) => {
+        if (selectedOU) {
+          const newDN = `CN=${cn},${selectedOU}`;
+          if (newDN.toLowerCase() === currentDN.toLowerCase()) {
+            this.showToast('El usuario ya se encuentra en esa ubicación');
+            return;
+          }
+
+          this.loading = true;
+          this.ouService.moveObject(currentDN, newDN).subscribe({
+            next: () => {
+              this.showToast('Usuario movido correctamente');
+              this.fetchUsers();
+            },
+            error: (err: any) => {
+              console.error(err);
+              this.showToast('Error al mover usuario');
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        }
+      });
     });
   }
 

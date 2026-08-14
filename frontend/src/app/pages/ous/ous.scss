@@ -1,0 +1,211 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+}
+
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.tree-container {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}
+
+.ou-tree {
+  background: transparent;
+}
+
+.tree-invisible {
+  display: none;
+}
+
+/* Children container */
+.tree-children {
+  padding-left: 24px;
+  position: relative;
+  
+  /* Indentation guide line */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 11px;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.tree-node-parent {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Base Node Content */
+.node-content {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0.25rem 0.5rem;
+  min-height: 36px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  width: 100%;
+  max-width: 900px;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    
+    .node-actions {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+/* Horizontal guide for leaves */
+.tree-node .node-content .tree-line {
+  position: absolute;
+  left: -13px;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.toggle-btn {
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  margin-right: 4px;
+  
+  .mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+.node-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  /* Add slight padding if it's a leaf node to align with parents (which have a toggle button) */
+  .tree-node & {
+    padding-left: 32px;
+  }
+
+  .node-icon {
+    font-size: 1.3rem;
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  .node-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .info-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: help;
+    
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+.node-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+  
+  button {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+    }
+  }
+}
+
+/* Text variations */
+.text-disabled {
+  text-decoration: line-through;
+  opacity: 0.5;
+  color: #ff5252 !important;
+}
+
+/* Node Icons Coloring */
+.node-ou .node-icon { color: #1976d2 !important; }
+.node-group .node-icon { color: #9c27b0 !important; }
+.node-user .node-icon { color: #009688 !important; }
+.node-user.text-disabled .node-icon { color: #f44336 !important; }
+
+/* Light theme overrides */
+:host-context(.theme-light) {
+  .page-header .subtitle {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .tree-children::before,
+  .tree-node .node-content .tree-line {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+  
+  .node-content:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  .node-info .info-icon {
+    color: rgba(0, 0, 0, 0.4);
+    &:hover {
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+}

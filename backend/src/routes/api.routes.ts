@@ -38,4 +38,12 @@ router.get('/computers', ComputerController.getAllComputers);
 // --- Rutas del Dashboard ---
 router.get('/dashboard/stats', getDashboardStats);
 
+// --- Rutas de OUs ---
+import { OuController } from '../controllers/ou.controller';
+router.get('/ous', OuController.getAllOUs);
+router.post('/ous', OuController.createOU);
+router.put('/ous', OuController.updateOU);
+router.delete('/ous', OuController.deleteOU);
+router.put('/ous/move', OuController.moveObject);
+
 export default router;

@@ -1,0 +1,88 @@
+<div class="page-container glass-panel">
+  <div class="page-header">
+    <div>
+      <h1>Unidades Organizativas</h1>
+      <p class="subtitle">Explorador del Directorio Activo</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="openOuDialog()">
+      <mat-icon>add</mat-icon> Nueva OU Raíz
+    </button>
+  </div>
+
+  <div *ngIf="loading()" class="loading-shade">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div class="tree-container" *ngIf="!loading()">
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="ou-tree">
+      
+      <!-- Nodo hoja (sin hijos) -->
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle class="tree-node">
+        <div class="node-content" [ngClass]="'node-' + node.type">
+          <!-- Guía visual (Indentation) -->
+          <div class="tree-line"></div>
+          
+          <div class="node-info">
+            <mat-icon *ngIf="node.type === 'ou'" color="primary" class="node-icon">folder</mat-icon>
+            <mat-icon *ngIf="node.type === 'group'" color="accent" class="node-icon">group</mat-icon>
+            <mat-icon *ngIf="node.type === 'user'" [color]="node.isDisabled ? 'warn' : 'primary'" class="node-icon" [style.opacity]="node.type === 'user' && !node.isDisabled ? '0.7' : '1'">person</mat-icon>
+            <mat-icon *ngIf="node.type === 'unknown'" class="node-icon">help_outline</mat-icon>
+            
+            <span class="node-name" [class.text-disabled]="node.isDisabled">{{ node.name }}</span>
+            <mat-icon *ngIf="node.description" class="info-icon" [matTooltip]="node.description">info</mat-icon>
+          </div>
+          
+          <div class="node-actions" *ngIf="node.type === 'ou'">
+            <button mat-icon-button (click)="openOuDialog(undefined, node)" matTooltip="Añadir Sub-OU">
+              <mat-icon>create_new_folder</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openOuDialog(node)" matTooltip="Editar OU">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteOu(node.dn, node.name)" matTooltip="Eliminar OU">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-tree-node>
+
+      <!-- Nodo rama (con hijos) -->
+      <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" class="tree-node-parent">
+        <div class="node-content" [ngClass]="'node-' + node.type">
+          <!-- Botón de expansión -->
+          <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name" class="toggle-btn">
+            <mat-icon class="mat-icon-rtl-mirror">
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          
+          <div class="node-info">
+            <mat-icon *ngIf="node.type === 'ou'" color="primary" class="node-icon">folder_shared</mat-icon>
+            <mat-icon *ngIf="node.type === 'group'" color="accent" class="node-icon">group</mat-icon>
+            
+            <span class="node-name">{{ node.name }}</span>
+            <mat-icon *ngIf="node.description" class="info-icon" [matTooltip]="node.description">info</mat-icon>
+          </div>
+          
+          <div class="node-actions" *ngIf="node.type === 'ou'">
+            <button mat-icon-button (click)="openOuDialog(undefined, node)" matTooltip="Añadir Sub-OU">
+              <mat-icon>create_new_folder</mat-icon>
+            </button>
+            <button mat-icon-button (click)="openOuDialog(node)" matTooltip="Editar OU">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteOu(node.dn, node.name)" matTooltip="Eliminar OU">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Hijos anidados -->
+        <div [class.tree-invisible]="!treeControl.isExpanded(node)" role="group" class="tree-children">
+          <ng-container matTreeNodeOutlet></ng-container>
+        </div>
+      </mat-nested-tree-node>
+      
+    </mat-tree>
+  </div>
+</div>
