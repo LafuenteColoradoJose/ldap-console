@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GroupService } from '../../core/services/group.service';
 import { MatTableModule } from '@angular/material/table';
@@ -31,30 +31,28 @@ import { OuService } from '../../core/services/ou.service';
 export class Groups implements OnInit {
   private groupService = inject(GroupService);
   private snackBar = inject(MatSnackBar);
-  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  private ouService = inject(OuService);
 
-  groups: any[] = [];
+  groups = signal<any[]>([]);
   displayedColumns: string[] = ['name', 'description', 'actions'];
-  loading = true;
+  loading = signal(true);
 
   ngOnInit() {
     this.fetchGroups();
   }
 
   fetchGroups() {
-    this.loading = true;
+    this.loading.set(true);
     this.groupService.getAllGroups().subscribe({
       next: (data) => {
-        this.groups = data || [];
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.groups.set(data || []);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
         this.showToast('Error al cargar grupos');
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.loading.set(false);
       }
     });
   }
@@ -74,7 +72,7 @@ export class Groups implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loading = true;
+        this.loading.set(true);
         if (isEdit) {
           const name = this.getGroupValue(group, 'sAMAccountName');
           this.groupService.updateGroup(name, result.description).subscribe({
@@ -85,8 +83,7 @@ export class Groups implements OnInit {
             error: (err) => {
               console.error(err);
               this.showToast('Error al actualizar grupo');
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         } else {
@@ -98,8 +95,7 @@ export class Groups implements OnInit {
             error: (err) => {
               console.error(err);
               this.showToast('Error al crear grupo');
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         }
@@ -110,7 +106,7 @@ export class Groups implements OnInit {
   deleteGroup(name: string) {
     if (!confirm(`¿Estás seguro de que deseas eliminar el grupo ${name}?`)) return;
 
-    this.loading = true;
+    this.loading.set(true);
     this.groupService.deleteGroup(name).subscribe({
       next: () => {
         this.showToast(`Grupo ${name} eliminado.`);
@@ -119,7 +115,7 @@ export class Groups implements OnInit {
       error: (err) => {
         console.error(err);
         this.showToast(`Error al eliminar: ${err.error?.message || err.message}`);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
@@ -142,8 +138,6 @@ export class Groups implements OnInit {
     });
   }
 
-  private ouService = inject(OuService);
-
   openMoveDialog(group: any) {
     const name = this.getGroupValue(group, 'sAMAccountName');
     const currentDN = this.getGroupValue(group, 'distinguishedName') || `CN=${name},CN=Users,DC=corp,DC=local`;
@@ -162,7 +156,7 @@ export class Groups implements OnInit {
             return;
           }
 
-          this.loading = true;
+          this.loading.set(true);
           this.ouService.moveObject(currentDN, newDN).subscribe({
             next: () => {
               this.showToast('Grupo movido correctamente');
@@ -171,8 +165,7 @@ export class Groups implements OnInit {
             error: (err: any) => {
               console.error(err);
               this.showToast('Error al mover grupo');
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         }

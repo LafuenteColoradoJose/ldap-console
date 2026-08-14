@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  @if (loading) {
+  @if (loading()) {
     <div class="loading-overlay">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
@@ -27,14 +27,18 @@
           </div>
         </div>
         <div class="kpi-body">
-          <div class="kpi-value">{{ stats?.users?.total || 0 }}</div>
-          <div class="kpi-chart-container">
-            <!-- CSS Mini Chart (Progress ring concept) -->
-            <div class="mini-chart">
-              <div class="chart-bar" [style.width.%]="getPercentage(stats?.users?.online, stats?.users?.total)"></div>
-            </div>
+          <div class="kpi-value">{{ stats()?.users?.total || 0 }}</div>
+          <div class="kpi-chart-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <apx-chart
+              [series]="usersChartOptions().series"
+              [chart]="usersChartOptions().chart"
+              [plotOptions]="usersChartOptions().plotOptions"
+              [fill]="usersChartOptions().fill"
+              [labels]="usersChartOptions().labels"
+              [colors]="usersChartOptions().colors">
+            </apx-chart>
             <span class="kpi-subtitle">
-              <span class="dot online"></span> {{ stats?.users?.online || 0 }} Conectados (30m)
+              <span class="dot online"></span> {{ stats()?.users?.online || 0 }} Conectados (30m)
             </span>
           </div>
         </div>
@@ -49,13 +53,18 @@
           </div>
         </div>
         <div class="kpi-body">
-          <div class="kpi-value">{{ stats?.computers?.total || 0 }}</div>
-          <div class="kpi-chart-container">
-            <div class="mini-chart accent">
-              <div class="chart-bar" [style.width.%]="getPercentage(stats?.computers?.online, stats?.computers?.total)"></div>
-            </div>
+          <div class="kpi-value">{{ stats()?.computers?.total || 0 }}</div>
+          <div class="kpi-chart-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+            <apx-chart
+              [series]="computersChartOptions().series"
+              [chart]="computersChartOptions().chart"
+              [plotOptions]="computersChartOptions().plotOptions"
+              [fill]="computersChartOptions().fill"
+              [labels]="computersChartOptions().labels"
+              [colors]="computersChartOptions().colors">
+            </apx-chart>
             <span class="kpi-subtitle">
-              <span class="dot online"></span> {{ stats?.computers?.online || 0 }} Encendidos
+              <span class="dot online"></span> {{ stats()?.computers?.online || 0 }} Encendidos
             </span>
           </div>
         </div>
@@ -70,7 +79,7 @@
           </div>
         </div>
         <div class="kpi-body">
-          <div class="kpi-value">{{ stats?.groups?.total || 0 }}</div>
+          <div class="kpi-value">{{ stats()?.groups?.total || 0 }}</div>
           <div class="kpi-chart-container">
              <span class="kpi-subtitle" style="margin-top: 18px;">Agrupaciones lógicas en el dominio</span>
           </div>

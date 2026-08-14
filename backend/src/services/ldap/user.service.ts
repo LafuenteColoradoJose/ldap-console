@@ -64,7 +64,7 @@ export class UserService {
   static async findUser(username: string): Promise<any | null> {
     const client = await getAdminClient();
     try {
-      const entries = await searchLdap(client, this.USERS_BASE_DN, {
+      const entries = await searchLdap(client, BASE_DN, {
         scope: 'sub',
         filter: `(&(objectClass=user)(sAMAccountName=${username}))`,
         attributes: ['sAMAccountName', 'givenName', 'sn', 'mail']
@@ -75,19 +75,33 @@ export class UserService {
     }
   }
 
+  static async findUserByCN(cn: string, client: ldap.Client): Promise<any | null> {
+    const entries = await searchLdap(client, BASE_DN, {
+      scope: 'sub',
+      filter: `(&(objectClass=user)(cn=${cn}))`,
+      attributes: ['dn']
+    });
+    return entries.length > 0 ? entries[0] : null;
+  }
+
   /**
    * Elimina un usuario por su CN completo
    */
   static async deleteUserByCN(cn: string): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
-      client.del(userDN, (err) => {
-        client.unbind();
-        if (err) return reject(err);
-        resolve();
+    try {
+      const user = await this.findUserByCN(cn, client);
+      if (!user) throw new Error('User not found');
+
+      return new Promise((resolve, reject) => {
+        client.del(user.objectName, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 
   /**
@@ -96,7 +110,7 @@ export class UserService {
   static async getAllUsers(): Promise<any[]> {
     const client = await getAdminClient();
     try {
-      const entries = await searchLdap(client, this.USERS_BASE_DN, {
+      const entries = await searchLdap(client, BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=user)',
         attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn', 'memberOf', 'lastLogon']
@@ -112,26 +126,31 @@ export class UserService {
    */
   static async toggleUserStatus(cn: string, enable: boolean): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
-      // 544: Normal (512) + PassNotReq (32). 
-      // 546: Normal (512) + Disabled (2) + PassNotReq (32).
-      const uacValue = enable ? '544' : '546';
-      
-      const change = new ldap.Change({
-        operation: 'replace',
-        modification: new ldap.Attribute({
-          type: 'userAccountControl',
-          vals: [uacValue]
-        })
-      });
+    try {
+      const user = await this.findUserByCN(cn, client);
+      if (!user) throw new Error('User not found');
 
-      client.modify(userDN, change, (err) => {
-        client.unbind();
-        if (err) return reject(err);
-        resolve();
+      return new Promise((resolve, reject) => {
+        // 544: Normal (512) + PassNotReq (32). 
+        // 546: Normal (512) + Disabled (2) + PassNotReq (32).
+        const uacValue = enable ? '544' : '546';
+        
+        const change = new ldap.Change({
+          operation: 'replace',
+          modification: new ldap.Attribute({
+            type: 'userAccountControl',
+            vals: [uacValue]
+          })
+        });
+
+        client.modify(user.objectName, change, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 
   /**
@@ -139,30 +158,33 @@ export class UserService {
    */
   static async updateUser(cn: string, data: { firstName?: string, lastName?: string, email?: string }): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const userDN = `CN=${cn},${this.USERS_BASE_DN}`;
-      
-      const modifications = [];
-      if (data.firstName !== undefined) {
-        modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'givenName', vals: [data.firstName] }) }));
-      }
-      if (data.lastName !== undefined) {
-        modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'sn', vals: [data.lastName] }) }));
-      }
-      if (data.email !== undefined) {
-        modifications.push(new ldap.Change({ operation: data.email ? 'replace' : 'delete', modification: new ldap.Attribute({ type: 'mail', vals: data.email ? [data.email] : [] }) }));
-      }
+    try {
+      const user = await this.findUserByCN(cn, client);
+      if (!user) throw new Error('User not found');
 
-      if (modifications.length === 0) {
-        client.unbind();
-        return resolve();
-      }
+      return new Promise((resolve, reject) => {
+        const modifications = [];
+        if (data.firstName !== undefined) {
+          modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'givenName', vals: [data.firstName] }) }));
+        }
+        if (data.lastName !== undefined) {
+          modifications.push(new ldap.Change({ operation: 'replace', modification: new ldap.Attribute({ type: 'sn', vals: [data.lastName] }) }));
+        }
+        if (data.email !== undefined) {
+          modifications.push(new ldap.Change({ operation: data.email ? 'replace' : 'delete', modification: new ldap.Attribute({ type: 'mail', vals: data.email ? [data.email] : [] }) }));
+        }
 
-      client.modify(userDN, modifications, (err) => {
-        client.unbind();
-        if (err) return reject(err);
-        resolve();
+        if (modifications.length === 0) {
+          return resolve();
+        }
+
+        client.modify(user.objectName, modifications, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 }

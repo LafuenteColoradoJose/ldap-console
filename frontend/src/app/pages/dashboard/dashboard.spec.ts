@@ -48,8 +48,8 @@ describe('Dashboard', () => {
   it('should fetch stats on init successfully', () => {
     component.fetchStats();
     expect(dashboardServiceMock.getStats).toHaveBeenCalled();
-    expect(component.stats?.users.total).toBe(10);
-    expect(component.loading).toBe(false);
+    expect(component.stats()?.users.total).toBe(10);
+    expect(component.loading()).toBe(false);
   });
 
   it('should handle error when fetching stats', () => {
@@ -59,7 +59,7 @@ describe('Dashboard', () => {
     component.fetchStats();
     
     expect(consoleSpy).toHaveBeenCalled();
-    expect(component.loading).toBe(false);
+    expect(component.loading()).toBe(false);
     
     consoleSpy.mockRestore();
   });

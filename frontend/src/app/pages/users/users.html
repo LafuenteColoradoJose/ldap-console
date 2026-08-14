@@ -13,13 +13,13 @@
   </div>
 
   <div class="table-container glass-card">
-    @if (loading) {
+    @if (loading()) {
       <div class="loading-overlay">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     }
 
-    <table mat-table [dataSource]="users" class="full-width-table">
+    <table mat-table [dataSource]="users()" class="full-width-table">
       
       <!-- Connection Column -->
       <ng-container matColumnDef="connection">

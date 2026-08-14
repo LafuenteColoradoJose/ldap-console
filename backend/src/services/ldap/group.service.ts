@@ -40,14 +40,19 @@ export class GroupService {
    */
   static async deleteGroup(groupName: string): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const groupDN = `CN=${groupName},${this.GROUPS_BASE_DN}`;
-      client.del(groupDN, (err) => {
-        client.unbind();
-        if (err) return reject(err);
-        resolve();
+    try {
+      const group = await this.findGroup(groupName);
+      if (!group) throw new Error('Group not found');
+      
+      return new Promise((resolve, reject) => {
+        client.del(group.objectName, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 
   /**
@@ -57,7 +62,7 @@ export class GroupService {
   static async findGroup(groupName: string): Promise<any | null> {
     const client = await getAdminClient();
     try {
-      const entries = await searchLdap(client, this.GROUPS_BASE_DN, {
+      const entries = await searchLdap(client, BASE_DN, {
         scope: 'sub',
         filter: `(&(objectClass=group)(sAMAccountName=${groupName}))`,
         attributes: ['sAMAccountName', 'description', 'member']
@@ -74,7 +79,7 @@ export class GroupService {
   static async getAllGroups(): Promise<any[]> {
     const client = await getAdminClient();
     try {
-      const entries = await searchLdap(client, this.GROUPS_BASE_DN, {
+      const entries = await searchLdap(client, BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=group)',
         attributes: ['sAMAccountName', 'description', 'member']
@@ -90,19 +95,24 @@ export class GroupService {
    */
   static async updateGroup(name: string, description: string): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const groupDN = `CN=${name},${this.GROUPS_BASE_DN}`;
-      const change = new ldap.Change({
-        operation: description ? 'replace' : 'delete',
-        modification: new ldap.Attribute({ type: 'description', vals: description ? [description] : [] })
-      });
+    try {
+      const group = await this.findGroup(name);
+      if (!group) throw new Error('Group not found');
+      
+      return new Promise((resolve, reject) => {
+        const change = new ldap.Change({
+          operation: description ? 'replace' : 'delete',
+          modification: new ldap.Attribute({ type: 'description', vals: description ? [description] : [] })
+        });
 
-      client.modify(groupDN, change, (err) => {
-        client.unbind();
-        if (err) return reject(err);
-        resolve();
+        client.modify(group.objectName, change, (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 
   /**
@@ -110,28 +120,35 @@ export class GroupService {
    */
   static async addMember(groupName: string, memberCN: string): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const groupDN = `CN=${groupName},${this.GROUPS_BASE_DN}`;
-      // Usamos el mismo BASE_DN que los usuarios (CN=Users)
-      const memberDN = `CN=${memberCN},CN=Users,${BASE_DN}`; 
-
-      const change = new ldap.Change({
-        operation: 'add',
-        modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+    try {
+      const group = await this.findGroup(groupName);
+      if (!group) throw new Error('Group not found');
+      
+      // Need to find user to get real DN too
+      const entries = await searchLdap(client, BASE_DN, {
+        scope: 'sub',
+        filter: `(&(objectClass=user)(cn=${memberCN}))`,
+        attributes: ['dn']
       });
+      const memberDN = entries.length > 0 ? entries[0].objectName : `CN=${memberCN},CN=Users,${BASE_DN}`;
 
-      client.modify(groupDN, change, (err) => {
-        client.unbind();
-        if (err) {
-          // Si ya existe (error 68: Entry Already Exists), lo damos por válido
-          if (err.name === 'EntryAlreadyExistsError' || err.code === 68) {
-            return resolve();
+      return new Promise((resolve, reject) => {
+        const change = new ldap.Change({
+          operation: 'add',
+          modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+        });
+
+        client.modify(group.objectName, change, (err) => {
+          if (err) {
+            if (err.name === 'EntryAlreadyExistsError' || err.code === 68) return resolve();
+            return reject(err);
           }
-          return reject(err);
-        }
-        resolve();
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 
   /**
@@ -139,26 +156,34 @@ export class GroupService {
    */
   static async removeMember(groupName: string, memberCN: string): Promise<void> {
     const client = await getAdminClient();
-    return new Promise((resolve, reject) => {
-      const groupDN = `CN=${groupName},${this.GROUPS_BASE_DN}`;
-      const memberDN = `CN=${memberCN},CN=Users,${BASE_DN}`;
-
-      const change = new ldap.Change({
-        operation: 'delete',
-        modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+    try {
+      const group = await this.findGroup(groupName);
+      if (!group) throw new Error('Group not found');
+      
+      // Need to find user to get real DN too
+      const entries = await searchLdap(client, BASE_DN, {
+        scope: 'sub',
+        filter: `(&(objectClass=user)(cn=${memberCN}))`,
+        attributes: ['dn']
       });
+      const memberDN = entries.length > 0 ? entries[0].objectName : `CN=${memberCN},CN=Users,${BASE_DN}`;
 
-      client.modify(groupDN, change, (err) => {
-        client.unbind();
-        if (err) {
-          // Si no existe el miembro (error 16: No Such Attribute), lo damos por válido
-          if (err.name === 'NoSuchAttributeError' || err.code === 16) {
-            return resolve();
+      return new Promise((resolve, reject) => {
+        const change = new ldap.Change({
+          operation: 'delete',
+          modification: new ldap.Attribute({ type: 'member', vals: [memberDN] })
+        });
+
+        client.modify(group.objectName, change, (err) => {
+          if (err) {
+            if (err.name === 'NoSuchAttributeError' || err.code === 16) return resolve();
+            return reject(err);
           }
-          return reject(err);
-        }
-        resolve();
+          resolve();
+        });
       });
-    });
+    } finally {
+      client.unbind();
+    }
   }
 }

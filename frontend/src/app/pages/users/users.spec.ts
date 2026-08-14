@@ -67,8 +67,8 @@ describe('Users', () => {
   it('should fetch users successfully', () => {
     component.fetchUsers();
     expect(userServiceMock.getAllUsers).toHaveBeenCalled();
-    expect(component.users.length).toBe(1);
-    expect(component.loading).toBe(false);
+    expect(component.users().length).toBe(1);
+    expect(component.loading()).toBe(false);
   });
 
   it('should handle error when fetching users', () => {
@@ -79,7 +79,7 @@ describe('Users', () => {
     
     expect(consoleSpy).toHaveBeenCalled();
     expect(snackBarMock.open).toHaveBeenCalledWith('Error al cargar usuarios', 'Cerrar', { duration: 3000 });
-    expect(component.loading).toBe(false);
+    expect(component.loading()).toBe(false);
   });
 
   it('should get user value', () => {
@@ -114,7 +114,7 @@ describe('Users', () => {
     
     component.toggleStatus(user);
     expect(consoleSpy).toHaveBeenCalled();
-    expect(component.loading).toBe(false);
+    expect(component.loading()).toBe(false);
   });
 
   it('should delete user if confirmed', () => {

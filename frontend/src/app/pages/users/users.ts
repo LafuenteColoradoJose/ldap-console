@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../core/services/user.service';
 import { MatTableModule } from '@angular/material/table';
@@ -33,30 +33,28 @@ import { OuService } from '../../core/services/ou.service';
 export class Users implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
-  private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  private ouService = inject(OuService);
 
-  users: any[] = [];
+  users = signal<any[]>([]);
   displayedColumns: string[] = ['connection', 'name', 'username', 'email', 'lastLogon', 'status', 'actions'];
-  loading = true;
+  loading = signal(true);
 
   ngOnInit() {
     this.fetchUsers();
   }
 
   fetchUsers() {
-    this.loading = true;
+    this.loading.set(true);
     this.userService.getAllUsers().subscribe({
       next: (data) => {
-        this.users = data || [];
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.users.set(data || []);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
         this.showToast('Error al cargar usuarios');
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.loading.set(false);
       }
     });
   }
@@ -78,7 +76,7 @@ export class Users implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loading = true;
+        this.loading.set(true);
         if (isEdit) {
           const cn = this.getUserValue(user, 'cn');
           this.userService.updateUser(cn, {
@@ -93,8 +91,7 @@ export class Users implements OnInit {
             error: (err) => {
               console.error(err);
               this.showToast('Error al actualizar usuario');
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         } else {
@@ -109,8 +106,7 @@ export class Users implements OnInit {
               this.showToast(msg.includes('Constraint Violation') 
                 ? 'Error: La contraseña no cumple los requisitos mínimos de seguridad (complejidad/longitud).' 
                 : `Error al aprovisionar: ${msg}`);
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         }
@@ -123,7 +119,7 @@ export class Users implements OnInit {
     const currentlyDisabled = this.isUserDisabled(user);
     const willEnable = currentlyDisabled;
 
-    this.loading = true;
+    this.loading.set(true);
     this.userService.toggleUserStatus(cn, willEnable).subscribe({
       next: () => {
         this.showToast(`Usuario ${willEnable ? 'habilitado' : 'deshabilitado'}.`);
@@ -132,8 +128,7 @@ export class Users implements OnInit {
       error: (err) => {
         console.error(err);
         this.showToast(`Error: ${err.error?.message || err.message}`);
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.loading.set(false);
       }
     });
   }
@@ -141,7 +136,7 @@ export class Users implements OnInit {
   deleteUser(cn: string) {
     if (!confirm(`¿Estás seguro de que deseas eliminar el usuario ${cn}?`)) return;
 
-    this.loading = true;
+    this.loading.set(true);
     this.userService.deleteUser(cn).subscribe({
       next: () => {
         this.showToast(`Usuario eliminado.`);
@@ -150,7 +145,7 @@ export class Users implements OnInit {
       error: (err) => {
         console.error(err);
         this.showToast(`Error al eliminar: ${err.error?.message || err.message}`);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
@@ -181,8 +176,6 @@ export class Users implements OnInit {
     });
   }
 
-  private ouService = inject(OuService);
-
   openMoveDialog(user: any) {
     const cn = this.getUserValue(user, 'cn');
     const gn = this.getUserValue(user, 'givenName');
@@ -204,7 +197,7 @@ export class Users implements OnInit {
             return;
           }
 
-          this.loading = true;
+          this.loading.set(true);
           this.ouService.moveObject(currentDN, newDN).subscribe({
             next: () => {
               this.showToast('Usuario movido correctamente');
@@ -213,8 +206,7 @@ export class Users implements OnInit {
             error: (err: any) => {
               console.error(err);
               this.showToast('Error al mover usuario');
-              this.loading = false;
-              this.cdr.detectChanges();
+              this.loading.set(false);
             }
           });
         }
@@ -230,8 +222,6 @@ export class Users implements OnInit {
 
   isUserDisabled(user: any): boolean {
     const uac = this.getUserValue(user, 'userAccountControl');
-    // UAC en Active Directory es un bitmask. 
-    // Si (uac & 2) === 2, la cuenta está deshabilitada.
     const uacInt = parseInt(uac, 10);
     return !isNaN(uacInt) && (uacInt & 2) === 2;
   }
@@ -240,11 +230,9 @@ export class Users implements OnInit {
     const lastLogon = this.getUserValue(user, 'lastLogon');
     if (!lastLogon || lastLogon === '0') return 'Nunca';
     
-    // lastLogon is Windows FileTime (100-nanosecond intervals since 1601-01-01)
     const fileTime = parseInt(lastLogon, 10);
     if (isNaN(fileTime)) return 'Desconocido';
     
-    // Convert to JavaScript Date (milliseconds since 1970-01-01)
     const jsTime = (fileTime / 10000) - 11644473600000;
     const date = new Date(jsTime);
     
@@ -261,10 +249,7 @@ export class Users implements OnInit {
     const fileTime = parseInt(lastLogon, 10);
     if (isNaN(fileTime)) return false;
     
-    // Convert Windows FileTime to JavaScript timestamp
     const jsTime = (fileTime / 10000) - 11644473600000;
-    
-    // Si se ha logueado en los últimos 30 minutos, lo consideramos "Online"
     const THIRTY_MINUTES = 30 * 60 * 1000;
     return (Date.now() - jsTime) < THIRTY_MINUTES;
   }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
@@ -12,12 +12,12 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss'
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
   @Output() navigate = new EventEmitter<void>();
 
-  isDark = false;
+  isDark = signal(false);
 
-  menuItems = [
+  menuItems = signal([
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/domain', label: 'Dominio', icon: 'account_tree' },
     { path: '/ous', label: 'Unidades Org.', icon: 'folder_shared' },
@@ -25,23 +25,23 @@ export class Sidebar {
     { path: '/groups', label: 'Grupos', icon: 'groups' },
     { path: '/machines', label: 'Equipos', icon: 'computer' },
     { path: '/gpo', label: 'Políticas (GPO)', icon: 'policy' },
-  ];
+  ]);
 
   ngOnInit() {
     // Detect current theme from localStorage or system
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      this.isDark = true;
+      this.isDark.set(true);
       document.body.classList.add('theme-dark');
     } else if (savedTheme === 'light') {
-      this.isDark = false;
+      this.isDark.set(false);
       document.body.classList.add('theme-light');
     }
   }
 
   toggleTheme() {
-    this.isDark = !this.isDark;
-    if (this.isDark) {
+    this.isDark.update(dark => !dark);
+    if (this.isDark()) {
       document.body.classList.remove('theme-light');
       document.body.classList.add('theme-dark');
       localStorage.setItem('theme', 'dark');

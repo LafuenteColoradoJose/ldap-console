@@ -9,11 +9,14 @@
     </button>
   </div>
 
-  <div *ngIf="loading()" class="loading-shade">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (loading()) {
+    <div class="loading-shade">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
-  <div class="tree-container" *ngIf="!loading()">
+  @if (!loading()) {
+    <div class="tree-container">
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="ou-tree">
       
       <!-- Nodo hoja (sin hijos) -->
@@ -23,16 +26,17 @@
           <div class="tree-line"></div>
           
           <div class="node-info">
-            <mat-icon *ngIf="node.type === 'ou'" color="primary" class="node-icon">folder</mat-icon>
-            <mat-icon *ngIf="node.type === 'group'" color="accent" class="node-icon">group</mat-icon>
-            <mat-icon *ngIf="node.type === 'user'" [color]="node.isDisabled ? 'warn' : 'primary'" class="node-icon" [style.opacity]="node.type === 'user' && !node.isDisabled ? '0.7' : '1'">person</mat-icon>
-            <mat-icon *ngIf="node.type === 'unknown'" class="node-icon">help_outline</mat-icon>
+            @if (node.type === 'ou') { <mat-icon color="primary" class="node-icon">folder</mat-icon> }
+            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon">group</mat-icon> }
+            @if (node.type === 'user') { <mat-icon [color]="node.isDisabled ? 'warn' : 'primary'" class="node-icon" [style.opacity]="node.isDisabled ? '1' : '0.7'">person</mat-icon> }
+            @if (node.type === 'unknown') { <mat-icon class="node-icon">help_outline</mat-icon> }
             
             <span class="node-name" [class.text-disabled]="node.isDisabled">{{ node.name }}</span>
-            <mat-icon *ngIf="node.description" class="info-icon" [matTooltip]="node.description">info</mat-icon>
+            @if (node.description) { <mat-icon class="info-icon" [matTooltip]="node.description">info</mat-icon> }
           </div>
           
-          <div class="node-actions" *ngIf="node.type === 'ou'">
+          @if (node.type === 'ou') {
+            <div class="node-actions">
             <button mat-icon-button (click)="openOuDialog(undefined, node)" matTooltip="Añadir Sub-OU">
               <mat-icon>create_new_folder</mat-icon>
             </button>
@@ -42,7 +46,8 @@
             <button mat-icon-button color="warn" (click)="deleteOu(node.dn, node.name)" matTooltip="Eliminar OU">
               <mat-icon>delete</mat-icon>
             </button>
-          </div>
+            </div>
+          }
         </div>
       </mat-tree-node>
 
@@ -57,14 +62,15 @@
           </button>
           
           <div class="node-info">
-            <mat-icon *ngIf="node.type === 'ou'" color="primary" class="node-icon">folder_shared</mat-icon>
-            <mat-icon *ngIf="node.type === 'group'" color="accent" class="node-icon">group</mat-icon>
+            @if (node.type === 'ou') { <mat-icon color="primary" class="node-icon">folder_shared</mat-icon> }
+            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon">group</mat-icon> }
             
             <span class="node-name">{{ node.name }}</span>
-            <mat-icon *ngIf="node.description" class="info-icon" [matTooltip]="node.description">info</mat-icon>
+            @if (node.description) { <mat-icon class="info-icon" [matTooltip]="node.description">info</mat-icon> }
           </div>
           
-          <div class="node-actions" *ngIf="node.type === 'ou'">
+          @if (node.type === 'ou') {
+            <div class="node-actions">
             <button mat-icon-button (click)="openOuDialog(undefined, node)" matTooltip="Añadir Sub-OU">
               <mat-icon>create_new_folder</mat-icon>
             </button>
@@ -74,7 +80,8 @@
             <button mat-icon-button color="warn" (click)="deleteOu(node.dn, node.name)" matTooltip="Eliminar OU">
               <mat-icon>delete</mat-icon>
             </button>
-          </div>
+            </div>
+          }
         </div>
         
         <!-- Hijos anidados -->
@@ -85,4 +92,5 @@
       
     </mat-tree>
   </div>
+  }
 </div>

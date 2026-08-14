@@ -1,4 +1,4 @@
-import { getAdminClient, searchLdap } from './ldap.client';
+import { BASE_DN, getAdminClient, searchLdap } from './ldap.client';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -7,6 +7,7 @@ const execAsync = promisify(exec);
 export class ComputerService {
   private static COMPUTERS_BASE_DN = process.env.COMPUTERS_BASE_DN || 'CN=Computers,DC=corp,DC=local';
   private static DOMAIN_CONTROLLERS_BASE_DN = process.env.DOMAIN_CONTROLLERS_BASE_DN || 'OU=Domain Controllers,DC=corp,DC=local';
+  private static ALL_BASE_DN = BASE_DN;
 
   private static getAttr(entry: any, type: string): string {
     const attr = entry.attributes?.find((a: any) => a.type === type);
@@ -16,21 +17,12 @@ export class ComputerService {
   static async getAllComputers(): Promise<any[]> {
     const client = await getAdminClient();
     try {
-      // Buscar en Computers
-      const computerEntries = await searchLdap(client, this.COMPUTERS_BASE_DN, {
+      // Buscar en todo el dominio
+      const allEntries = await searchLdap(client, this.ALL_BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=computer)',
         attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'lastLogon', 'userAccountControl']
       });
-
-      // Buscar en Domain Controllers
-      const dcEntries = await searchLdap(client, this.DOMAIN_CONTROLLERS_BASE_DN, {
-        scope: 'sub',
-        filter: '(objectClass=computer)',
-        attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'lastLogon', 'userAccountControl']
-      });
-
-      const allEntries = [...computerEntries, ...dcEntries];
 
       // Mapear y hacer ping a cada máquina
       const computers = await Promise.all(allEntries.map(async (entry) => {

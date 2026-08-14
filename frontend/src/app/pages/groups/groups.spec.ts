@@ -66,8 +66,8 @@ describe('Groups', () => {
   it('should fetch groups successfully', () => {
     component.fetchGroups();
     expect(groupServiceMock.getAllGroups).toHaveBeenCalled();
-    expect(component.groups.length).toBe(1);
-    expect(component.loading).toBe(false);
+    expect(component.groups().length).toBe(1);
+    expect(component.loading()).toBe(false);
   });
 
   it('should handle error when fetching groups', () => {
@@ -78,7 +78,7 @@ describe('Groups', () => {
     
     expect(consoleSpy).toHaveBeenCalled();
     expect(snackBarMock.open).toHaveBeenCalledWith('Error al cargar grupos', 'Cerrar', { duration: 3000 });
-    expect(component.loading).toBe(false);
+    expect(component.loading()).toBe(false);
   });
 
   it('should get group value', () => {
