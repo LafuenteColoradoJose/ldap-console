@@ -20,14 +20,14 @@ export class ComputerService {
       const computerEntries = await searchLdap(client, this.COMPUTERS_BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=computer)',
-        attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'userAccountControl']
+        attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'lastLogon', 'userAccountControl']
       });
 
       // Buscar en Domain Controllers
       const dcEntries = await searchLdap(client, this.DOMAIN_CONTROLLERS_BASE_DN, {
         scope: 'sub',
         filter: '(objectClass=computer)',
-        attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'userAccountControl']
+        attributes: ['cn', 'dNSHostName', 'operatingSystem', 'operatingSystemVersion', 'whenCreated', 'lastLogonTimestamp', 'lastLogon', 'userAccountControl']
       });
 
       const allEntries = [...computerEntries, ...dcEntries];
@@ -40,16 +40,21 @@ export class ComputerService {
         const operatingSystemVersion = this.getAttr(entry, 'operatingSystemVersion');
         const whenCreated = this.getAttr(entry, 'whenCreated');
         
-        const hostname = dNSHostName || cn;
-        let isOnline = false;
+        const lastLogonTimestamp = this.getAttr(entry, 'lastLogonTimestamp');
+        const lastLogon = this.getAttr(entry, 'lastLogon');
         
-        if (hostname) {
-          try {
-            // Intentamos hacer un ping de 1 paquete con timeout de 1 segundo
-            await execAsync(`ping -c 1 -W 1 ${hostname}`);
-            isOnline = true;
-          } catch (error) {
-            isOnline = false;
+        // Prefer lastLogon as it's more accurate for the current DC, fallback to lastLogonTimestamp
+        const bestLogon = lastLogon || lastLogonTimestamp;
+        
+        let isOnline = false;
+
+        if (bestLogon && bestLogon !== '0') {
+          const fileTime = parseInt(bestLogon, 10);
+          if (!isNaN(fileTime)) {
+            const jsTime = (fileTime / 10000) - 11644473600000;
+            // Si el equipo contactó con el DC en los últimos 30 minutos
+            const THIRTY_MINUTES = 30 * 60 * 1000;
+            isOnline = (Date.now() - jsTime) < THIRTY_MINUTES;
           }
         }
 
@@ -60,6 +65,7 @@ export class ComputerService {
           operatingSystem: operatingSystem || 'Desconocido',
           operatingSystemVersion: operatingSystemVersion,
           whenCreated: whenCreated,
+          lastLogonTimestamp: lastLogonTimestamp,
           isOnline: isOnline
         };
       }));

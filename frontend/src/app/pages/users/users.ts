@@ -36,7 +36,7 @@ export class Users implements OnInit {
   private dialog = inject(MatDialog);
 
   users: any[] = [];
-  displayedColumns: string[] = ['name', 'username', 'email', 'lastLogon', 'status', 'actions'];
+  displayedColumns: string[] = ['connection', 'name', 'username', 'email', 'lastLogon', 'status', 'actions'];
   loading = true;
 
   ngOnInit() {
@@ -210,5 +210,20 @@ export class Users implements OnInit {
       day: '2-digit', month: '2-digit', year: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
+  }
+
+  isUserOnline(user: any): boolean {
+    const lastLogon = this.getUserValue(user, 'lastLogon');
+    if (!lastLogon || lastLogon === '0') return false;
+    
+    const fileTime = parseInt(lastLogon, 10);
+    if (isNaN(fileTime)) return false;
+    
+    // Convert Windows FileTime to JavaScript timestamp
+    const jsTime = (fileTime / 10000) - 11644473600000;
+    
+    // Si se ha logueado en los últimos 30 minutos, lo consideramos "Online"
+    const THIRTY_MINUTES = 30 * 60 * 1000;
+    return (Date.now() - jsTime) < THIRTY_MINUTES;
   }
 }

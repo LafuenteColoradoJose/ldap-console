@@ -129,6 +129,23 @@
   }
 }
 
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 auto;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  
+  &.online {
+    background-color: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+  
+  &.offline {
+    background-color: #ef4444;
+  }
+}
+
 .text-right {
   text-align: right;
   justify-content: flex-end;

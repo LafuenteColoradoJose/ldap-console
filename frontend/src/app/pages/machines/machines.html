@@ -23,7 +23,7 @@
           <th mat-header-cell *matHeaderCellDef class="w-16 text-center"> Estado </th>
           <td mat-cell *matCellDef="let element" class="text-center">
             <div class="status-indicator" [class.online]="element.isOnline" [class.offline]="!element.isOnline" 
-                 [matTooltip]="element.isOnline ? 'Online (Ping OK)' : 'Offline o Ping Bloqueado'"></div>
+                 [matTooltip]="element.isOnline ? 'Equipo Conectado (Actividad en los últimos 30m)' : 'Equipo Desconectado'"></div>
           </td>
         </ng-container>
 
