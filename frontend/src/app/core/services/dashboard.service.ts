@@ -3,9 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DashboardStats {
-  users: { total: number; online: number };
+  users: { 
+    total: number; 
+    online: number;
+    recent?: { username: string, fullName: string, lastLogonTs: number }[];
+  };
   groups: { total: number };
-  computers: { total: number; online: number };
+  ous: { total: number };
+  computers: { 
+    total: number; 
+    online: number;
+    osStats?: Record<string, number>;
+  };
 }
 
 export interface DashboardStatsResponse {

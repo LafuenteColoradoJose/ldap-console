@@ -1,148 +1,184 @@
-<div class="page-container fade-in">
-  <!-- Welcome Banner -->
-  <div class="welcome-banner glass-card">
-    <div class="banner-content">
-      <h1>Resumen del Dominio</h1>
-      <p class="subtitle">Visión general del estado del directorio activo y accesos rápidos.</p>
-    </div>
-    <div class="banner-illustration">
-      <mat-icon>dashboard_customize</mat-icon>
-    </div>
-  </div>
-
+<div class="dashboard-container">
   @if (loading()) {
-    <div class="loading-overlay">
+    <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando métricas del dominio...</p>
     </div>
-  } @else {
-    <!-- KPI Grid -->
+  } @else if (stats()) {
+    <div class="dashboard-header">
+      <div class="header-text">
+        <h1>Centro de Control del Dominio</h1>
+        <p>Visión general del estado del directorio activo, actividad en tiempo real y dispositivos.</p>
+      </div>
+      <div class="header-status glass-card">
+        <mat-icon class="icon-success">verified_user</mat-icon>
+        <div class="status-info">
+          <span class="status-title">Estado del Directorio</span>
+          <span class="status-value success">LDAP Activo & Conectado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Row: KPI Cards -->
     <div class="kpi-grid">
-      
-      <!-- Users Card -->
+      <!-- Users KPI -->
       <div class="kpi-card glass-card">
-        <div class="kpi-header">
-          <div class="kpi-title">
-            <mat-icon class="text-primary">group</mat-icon>
-            <span>Usuarios Totales</span>
+        <div class="kpi-content">
+          <div class="kpi-icon blue"><mat-icon>group</mat-icon></div>
+          <div class="kpi-data">
+            <h3>Usuarios Totales</h3>
+            <div class="kpi-value">{{ stats()?.users?.total }}</div>
           </div>
         </div>
-        <div class="kpi-body">
-          <div class="kpi-value">{{ stats()?.users?.total || 0 }}</div>
-          <div class="kpi-chart-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-            <apx-chart
-              [series]="usersChartOptions().series"
-              [chart]="usersChartOptions().chart"
-              [plotOptions]="usersChartOptions().plotOptions"
-              [fill]="usersChartOptions().fill"
-              [labels]="usersChartOptions().labels"
-              [colors]="usersChartOptions().colors">
-            </apx-chart>
-            <span class="kpi-subtitle">
-              <span class="dot online"></span> {{ stats()?.users?.online || 0 }} Conectados (30m)
-            </span>
-          </div>
+        <div class="kpi-chart">
+          <apx-chart
+            [series]="usersChartOptions().series"
+            [chart]="usersChartOptions().chart"
+            [plotOptions]="usersChartOptions().plotOptions"
+            [colors]="usersChartOptions().colors"
+            [fill]="usersChartOptions().fill"
+            [labels]="usersChartOptions().labels"
+          ></apx-chart>
         </div>
       </div>
 
-      <!-- Computers Card -->
+      <!-- Computers KPI -->
       <div class="kpi-card glass-card">
-        <div class="kpi-header">
-          <div class="kpi-title">
-            <mat-icon class="text-accent">computer</mat-icon>
-            <span>Equipos del Dominio</span>
+        <div class="kpi-content">
+          <div class="kpi-icon pink"><mat-icon>computer</mat-icon></div>
+          <div class="kpi-data">
+            <h3>Equipos en Dominio</h3>
+            <div class="kpi-value">{{ stats()?.computers?.total }}</div>
           </div>
         </div>
-        <div class="kpi-body">
-          <div class="kpi-value">{{ stats()?.computers?.total || 0 }}</div>
-          <div class="kpi-chart-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-            <apx-chart
-              [series]="computersChartOptions().series"
-              [chart]="computersChartOptions().chart"
-              [plotOptions]="computersChartOptions().plotOptions"
-              [fill]="computersChartOptions().fill"
-              [labels]="computersChartOptions().labels"
-              [colors]="computersChartOptions().colors">
-            </apx-chart>
-            <span class="kpi-subtitle">
-              <span class="dot online"></span> {{ stats()?.computers?.online || 0 }} Encendidos
-            </span>
-          </div>
+        <div class="kpi-chart">
+          <apx-chart
+            [series]="computersChartOptions().series"
+            [chart]="computersChartOptions().chart"
+            [plotOptions]="computersChartOptions().plotOptions"
+            [colors]="computersChartOptions().colors"
+            [fill]="computersChartOptions().fill"
+            [labels]="computersChartOptions().labels"
+          ></apx-chart>
         </div>
       </div>
 
-      <!-- Groups Card -->
+      <!-- Groups KPI -->
       <div class="kpi-card glass-card">
-        <div class="kpi-header">
-          <div class="kpi-title">
-            <mat-icon class="text-warn">folder_shared</mat-icon>
-            <span>Grupos de Seguridad</span>
+        <div class="kpi-content">
+          <div class="kpi-icon purple"><mat-icon>folder_shared</mat-icon></div>
+          <div class="kpi-data">
+            <h3>Grupos de Seguridad</h3>
+            <div class="kpi-value">{{ stats()?.groups?.total }}</div>
           </div>
         </div>
-        <div class="kpi-body">
-          <div class="kpi-value">{{ stats()?.groups?.total || 0 }}</div>
-          <div class="kpi-chart-container">
-             <span class="kpi-subtitle" style="margin-top: 18px;">Agrupaciones lógicas en el dominio</span>
-          </div>
+        <div class="kpi-desc">
+          <span>Agrupaciones lógicas y permisos del directorio</span>
         </div>
       </div>
 
-      <!-- Server Status Card -->
+      <!-- OUs KPI -->
       <div class="kpi-card glass-card">
-        <div class="kpi-header">
-          <div class="kpi-title">
-            <mat-icon style="color: #10b981;">dns</mat-icon>
-            <span>Estado del Servidor</span>
+        <div class="kpi-content">
+          <div class="kpi-icon orange" style="background: rgba(255, 152, 0, 0.1); color: #ff9800;"><mat-icon>account_tree</mat-icon></div>
+          <div class="kpi-data">
+            <h3>Unidades Organizativas</h3>
+            <div class="kpi-value">{{ stats()?.ous?.total }}</div>
           </div>
         </div>
-        <div class="kpi-body">
-          <div class="kpi-value" style="font-size: 1.8rem; display: flex; align-items: center; gap: 8px;">
-            <span class="status-indicator online" style="position: relative; top: 0; display: inline-block;"></span> LDAP Activo
-          </div>
-          <div class="kpi-chart-container">
-             <span class="kpi-subtitle" style="margin-top: 14px;">Conectado mediante LDAPS (Puerto 636)</span>
-          </div>
+        <div class="kpi-desc">
+          <span>Estructura jerárquica del dominio</span>
         </div>
       </div>
-
     </div>
 
-    <!-- Quick Actions -->
-    <h2 class="section-title">Accesos Rápidos</h2>
-    <div class="quick-actions-grid">
-      
-      <button class="action-card" (click)="navigate('/users')">
-        <div class="action-icon primary-bg">
-          <mat-icon>person_add</mat-icon>
+    <!-- Middle Row: Charts & Activity -->
+    <div class="middle-grid">
+      <!-- OS Distribution Chart -->
+      <div class="chart-card glass-card">
+        <div class="card-header">
+          <h3>Distribución de Sistemas Operativos</h3>
+          <mat-icon>pie_chart</mat-icon>
         </div>
-        <div class="action-text">
-          <h3>Gestión de Usuarios</h3>
-          <p>Crear, editar o deshabilitar cuentas</p>
+        <div class="card-body donut-wrapper">
+          <apx-chart
+            [series]="osChartOptions().series"
+            [chart]="osChartOptions().chart"
+            [labels]="osChartOptions().labels"
+            [colors]="osChartOptions().colors"
+            [legend]="osChartOptions().legend"
+            [dataLabels]="osChartOptions().dataLabels"
+            [stroke]="osChartOptions().stroke"
+            [tooltip]="osChartOptions().tooltip"
+          ></apx-chart>
         </div>
-        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
-      </button>
+      </div>
 
-      <button class="action-card" (click)="navigate('/machines')">
-        <div class="action-icon accent-bg">
-          <mat-icon>add_to_queue</mat-icon>
+      <!-- Recent Logins -->
+      <div class="activity-card glass-card">
+        <div class="card-header">
+          <h3>Actividad Reciente</h3>
+          <mat-icon>history</mat-icon>
         </div>
-        <div class="action-text">
-          <h3>Equipos</h3>
-          <p>Supervisar ordenadores unidos</p>
+        <div class="card-body">
+          <div class="activity-list">
+            @for (user of stats()?.users?.recent; track user.username) {
+              <div class="activity-item">
+                <div class="activity-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="activity-details">
+                  <span class="activity-name">{{ user.fullName }} ({{ user.username }})</span>
+                  <span class="activity-time">Inició sesión: {{ formatDate(user.lastLogonTs) }}</span>
+                </div>
+                <div class="activity-status online"></div>
+              </div>
+            } @empty {
+              <div class="empty-state">
+                No hay actividad reciente.
+              </div>
+            }
+          </div>
         </div>
-        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
-      </button>
+      </div>
+    </div>
 
-      <button class="action-card" (click)="navigate('/groups')">
-        <div class="action-icon warn-bg">
-          <mat-icon>group_add</mat-icon>
-        </div>
-        <div class="action-text">
-          <h3>Grupos de Seguridad</h3>
-          <p>Administrar roles y permisos</p>
-        </div>
-        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
-      </button>
+    <!-- Bottom Row: Quick Access -->
+    <div class="quick-access-section">
+      <h3>Accesos Rápidos</h3>
+      <div class="quick-access-grid">
+        <button class="quick-btn glass-card" (click)="navigate('/users')">
+          <div class="quick-icon"><mat-icon>person_add</mat-icon></div>
+          <div class="quick-text">
+            <h4>Gestión de Usuarios</h4>
+            <p>Aprovisionar cuentas</p>
+          </div>
+        </button>
+        
+        <button class="quick-btn glass-card" (click)="navigate('/computers')">
+          <div class="quick-icon"><mat-icon>devices</mat-icon></div>
+          <div class="quick-text">
+            <h4>Equipos</h4>
+            <p>Monitorizar dispositivos</p>
+          </div>
+        </button>
+        
+        <button class="quick-btn glass-card" (click)="navigate('/groups')">
+          <div class="quick-icon"><mat-icon>admin_panel_settings</mat-icon></div>
+          <div class="quick-text">
+            <h4>Grupos y Roles</h4>
+            <p>Administrar seguridad</p>
+          </div>
+        </button>
 
+        <button class="quick-btn glass-card" (click)="navigate('/ous')">
+          <div class="quick-icon"><mat-icon>account_tree</mat-icon></div>
+          <div class="quick-text">
+            <h4>Unidades Organizativas</h4>
+            <p>Estructura del dominio</p>
+          </div>
+        </button>
+      </div>
     </div>
   }
 </div>

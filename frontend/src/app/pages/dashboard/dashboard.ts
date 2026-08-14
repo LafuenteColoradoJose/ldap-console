@@ -3,9 +3,10 @@ import { Router } from '@angular/router';
 import { DashboardService, DashboardStats } from '../../core/services/dashboard.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NgApexchartsModule, ApexChart, ApexNonAxisChartSeries, ApexPlotOptions, ApexFill } from 'ng-apexcharts';
+import { NgApexchartsModule, ApexChart, ApexNonAxisChartSeries, ApexPlotOptions, ApexFill, ApexLegend, ApexDataLabels, ApexStroke, ApexTooltip } from 'ng-apexcharts';
+import { CommonModule } from '@angular/common';
 
-export type ChartOptions = {
+export type RadialChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
   labels: string[];
@@ -14,10 +15,21 @@ export type ChartOptions = {
   colors: string[];
 };
 
+export type DonutChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: string[];
+  colors: string[];
+  legend: ApexLegend;
+  dataLabels: ApexDataLabels;
+  stroke: ApexStroke;
+  tooltip: ApexTooltip;
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [MatIconModule, MatProgressSpinnerModule, NgApexchartsModule],
+  imports: [CommonModule, MatIconModule, MatProgressSpinnerModule, NgApexchartsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -29,17 +41,44 @@ export class Dashboard implements OnInit {
   stats = signal<DashboardStats | null>(null);
 
   // Users chart options computed from stats
-  usersChartOptions = computed<ChartOptions>(() => {
+  usersChartOptions = computed<RadialChartOptions>(() => {
     const s = this.stats();
     const pct = this.getPercentage(s?.users?.online, s?.users?.total);
-    return this.createRadialChartOptions([pct], ['Conectados'], ['#3f51b5']);
+    return this.createRadialChartOptions([pct], ['Conectados'], ['#00e676']); // Neon green
   });
 
   // Computers chart options computed from stats
-  computersChartOptions = computed<ChartOptions>(() => {
+  computersChartOptions = computed<RadialChartOptions>(() => {
     const s = this.stats();
     const pct = this.getPercentage(s?.computers?.online, s?.computers?.total);
-    return this.createRadialChartOptions([pct], ['Encendidos'], ['#ff4081']);
+    return this.createRadialChartOptions([pct], ['Encendidos'], ['#00b0ff']); // Neon blue
+  });
+
+  // OS Distribution Chart
+  osChartOptions = computed<DonutChartOptions>(() => {
+    const s = this.stats();
+    const osStats = s?.computers?.osStats || {};
+    const labels = Object.keys(osStats);
+    const series = Object.values(osStats) as number[];
+
+    return {
+      series: series.length ? series : [1],
+      labels: labels.length ? labels : ['Sin datos'],
+      chart: {
+        type: 'donut',
+        height: 280,
+        background: 'transparent',
+        fontFamily: 'Inter, sans-serif'
+      },
+      colors: ['#00e676', '#00b0ff', '#f50057', '#ffea00', '#d500f9'],
+      stroke: { show: true, colors: ['rgba(0,0,0,0.2)'], width: 2 },
+      dataLabels: { enabled: false },
+      legend: {
+        position: 'bottom',
+        labels: { colors: 'var(--text-color, #e0e0e0)' }
+      },
+      tooltip: { theme: 'dark' }
+    };
   });
 
   ngOnInit() {
@@ -71,11 +110,16 @@ export class Dashboard implements OnInit {
     this.router.navigate([path]);
   }
 
-  private createRadialChartOptions(series: number[], labels: string[], colors: string[]): ChartOptions {
+  formatDate(timestamp: number): string {
+    if (!timestamp || timestamp === 0) return 'Nunca';
+    return new Date(timestamp).toLocaleString();
+  }
+
+  private createRadialChartOptions(series: number[], labels: string[], colors: string[]): RadialChartOptions {
     return {
       series,
       chart: {
-        height: 150,
+        height: 120,
         type: 'radialBar',
         sparkline: { enabled: true }
       },
@@ -85,16 +129,16 @@ export class Dashboard implements OnInit {
           startAngle: -90,
           endAngle: 90,
           track: {
-            background: 'rgba(255, 255, 255, 0.1)',
+            background: 'rgba(255, 255, 255, 0.05)',
             margin: 5
           },
           dataLabels: {
             name: { show: false },
             value: {
               offsetY: 0,
-              fontSize: '22px',
+              fontSize: '16px',
               fontWeight: 600,
-              color: 'var(--text-color, #ffffff)',
+              color: colors[0],
               formatter: function (val) {
                 return val + "%";
               }
@@ -107,7 +151,7 @@ export class Dashboard implements OnInit {
         gradient: {
           shade: 'dark',
           type: 'horizontal',
-          gradientToColors: [colors[0] + '88'],
+          gradientToColors: [colors[0] + 'aa'],
           stops: [0, 100]
         }
       },
