@@ -1,1 +1,139 @@
-<p>dashboard works!</p>
+<div class="page-container fade-in">
+  <!-- Welcome Banner -->
+  <div class="welcome-banner glass-card">
+    <div class="banner-content">
+      <h1>Resumen del Dominio</h1>
+      <p class="subtitle">Visión general del estado del directorio activo y accesos rápidos.</p>
+    </div>
+    <div class="banner-illustration">
+      <mat-icon>dashboard_customize</mat-icon>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      
+      <!-- Users Card -->
+      <div class="kpi-card glass-card">
+        <div class="kpi-header">
+          <div class="kpi-title">
+            <mat-icon class="text-primary">group</mat-icon>
+            <span>Usuarios Totales</span>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats?.users?.total || 0 }}</div>
+          <div class="kpi-chart-container">
+            <!-- CSS Mini Chart (Progress ring concept) -->
+            <div class="mini-chart">
+              <div class="chart-bar" [style.width.%]="getPercentage(stats?.users?.online, stats?.users?.total)"></div>
+            </div>
+            <span class="kpi-subtitle">
+              <span class="dot online"></span> {{ stats?.users?.online || 0 }} Conectados (30m)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Computers Card -->
+      <div class="kpi-card glass-card">
+        <div class="kpi-header">
+          <div class="kpi-title">
+            <mat-icon class="text-accent">computer</mat-icon>
+            <span>Equipos del Dominio</span>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats?.computers?.total || 0 }}</div>
+          <div class="kpi-chart-container">
+            <div class="mini-chart accent">
+              <div class="chart-bar" [style.width.%]="getPercentage(stats?.computers?.online, stats?.computers?.total)"></div>
+            </div>
+            <span class="kpi-subtitle">
+              <span class="dot online"></span> {{ stats?.computers?.online || 0 }} Encendidos
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Groups Card -->
+      <div class="kpi-card glass-card">
+        <div class="kpi-header">
+          <div class="kpi-title">
+            <mat-icon class="text-warn">folder_shared</mat-icon>
+            <span>Grupos de Seguridad</span>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value">{{ stats?.groups?.total || 0 }}</div>
+          <div class="kpi-chart-container">
+             <span class="kpi-subtitle" style="margin-top: 18px;">Agrupaciones lógicas en el dominio</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Server Status Card -->
+      <div class="kpi-card glass-card">
+        <div class="kpi-header">
+          <div class="kpi-title">
+            <mat-icon style="color: #10b981;">dns</mat-icon>
+            <span>Estado del Servidor</span>
+          </div>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-value" style="font-size: 1.8rem; display: flex; align-items: center; gap: 8px;">
+            <span class="status-indicator online" style="position: relative; top: 0; display: inline-block;"></span> LDAP Activo
+          </div>
+          <div class="kpi-chart-container">
+             <span class="kpi-subtitle" style="margin-top: 14px;">Conectado mediante LDAPS (Puerto 636)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <h2 class="section-title">Accesos Rápidos</h2>
+    <div class="quick-actions-grid">
+      
+      <button class="action-card" (click)="navigate('/users')">
+        <div class="action-icon primary-bg">
+          <mat-icon>person_add</mat-icon>
+        </div>
+        <div class="action-text">
+          <h3>Gestión de Usuarios</h3>
+          <p>Crear, editar o deshabilitar cuentas</p>
+        </div>
+        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+      </button>
+
+      <button class="action-card" (click)="navigate('/machines')">
+        <div class="action-icon accent-bg">
+          <mat-icon>add_to_queue</mat-icon>
+        </div>
+        <div class="action-text">
+          <h3>Equipos</h3>
+          <p>Supervisar ordenadores unidos</p>
+        </div>
+        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+      </button>
+
+      <button class="action-card" (click)="navigate('/groups')">
+        <div class="action-icon warn-bg">
+          <mat-icon>group_add</mat-icon>
+        </div>
+        <div class="action-text">
+          <h3>Grupos de Seguridad</h3>
+          <p>Administrar roles y permisos</p>
+        </div>
+        <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+      </button>
+
+    </div>
+  }
+</div>

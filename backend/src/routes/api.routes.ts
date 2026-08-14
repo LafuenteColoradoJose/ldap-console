@@ -4,6 +4,7 @@ import { DomainController } from '../controllers/domain.controller';
 import { GroupController } from '../controllers/group.controller';
 import { UserController } from '../controllers/user.controller';
 import { ComputerController } from '../controllers/computer.controller';
+import { getDashboardStats } from '../controllers/dashboard.controller';
 
 const router = Router();
 
@@ -33,5 +34,8 @@ router.delete('/users/:cn', UserController.deleteUser);
 
 // --- Rutas de Equipos ---
 router.get('/computers', ComputerController.getAllComputers);
+
+// --- Rutas del Dashboard ---
+router.get('/dashboard/stats', getDashboardStats);
 
 export default router;
