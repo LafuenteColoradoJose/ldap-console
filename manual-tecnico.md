@@ -19,7 +19,7 @@ El proyecto sigue un enfoque **Monorepo**, separando claramente las responsabili
 
 3.  **Frontend (Capa de Presentación)**
     *   **Stack**: Angular 22 (Standalone Components) + Angular Material.
-    *   **Diseño**: Mobile-first, implementando SCSS puro para efectos de transiciones (inspirado en el patrón *Eye of Medina* para el Sidebar).
+    *   **Diseño**: Mobile-first, implementando SCSS puro para efectos de transiciones.
     *   **Gestión de Estado**: Utiliza **Angular Signals** (ej. `computed`, `signal`) para el estado reactivo, reemplazando a RxJS donde el flujo es síncrono o dependiente de estado local (como el estado de Autenticación).
 
 ## 🧪 Estrategia de Testing (Frontend)

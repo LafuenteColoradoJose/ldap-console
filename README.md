@@ -87,7 +87,7 @@ curl http://localhost:3000/api/status
 > **Importante:** El backend utiliza el protocolo **LDAPS seguro (puerto 636)** ya que Samba4, por defecto, exige cifrado (*Strong Auth Required*) para autenticar usuarios con contraseñas. Para el entorno de desarrollo local, el backend está configurado para aceptar certificados autofirmados (`rejectUnauthorized: false`).
 
 ### 5. Ejecutar el Frontend
-La interfaz de usuario está desarrollada en Angular con Angular Material y SCSS puro (efectos de hover *Eye of Medina*).
+La interfaz de usuario está desarrollada en Angular con Angular Material y SCSS puro.
 
 ```bash
 cd frontend
