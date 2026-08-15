@@ -22,12 +22,12 @@ La interfaz está diseñada bajo el patrón de **diseño responsivo**. Se adapta
 
 LDAP Console está dividido en varias secciones accesibles desde el menú lateral:
 
-*   **Dashboard (Panel de Control):** Portada interactiva de la aplicación con estética moderna (glassmorphism y modo oscuro) que muestra estadísticas globales del dominio, gráficos de distribución de sistemas operativos y KPIs de usuarios, equipos y Unidades Organizativas.
-*   **Gestión de Usuarios:** Permite crear, modificar, deshabilitar y eliminar cuentas de usuario. 
-    *   *Indicador de Conexión:* Muestra un punto verde si el usuario se ha autenticado en el dominio en los últimos 30 minutos (basado en su `lastLogon`), o rojo si está desconectado.
+*   **Dashboard (Panel de Control):** Portada interactiva de la aplicación con estética moderna (glassmorphism y modo oscuro) que muestra estadísticas globales del dominio. Ahora cuenta de forma inteligente a los verdaderos usuarios (excluyendo a las cuentas de los propios ordenadores) para mostrar métricas exactas.
+*   **Gestión de Usuarios:** Permite crear, modificar, deshabilitar y eliminar cuentas de usuario.
 *   **Equipos (Computers):** Muestra todos los ordenadores y servidores que han sido unidos al Active Directory.
-    *   *Estado en Tiempo Real:* Al igual que los usuarios, incluye un indicador visual para saber si el equipo ha contactado recientemente con el controlador de dominio.
+    *   *Estado en Tiempo Real (Ping):* La aplicación resuelve la IP interna del equipo contra el servidor DNS del Active Directory y realiza un PING en tiempo real para verificar de forma infalible si el equipo está realmente encendido y conectado a la red.
 *   **Estructura del Dominio:** Visualiza la jerarquía de las Unidades Organizativas (OU) y contenedores principales de tu AD.
+    *   *Gestión rápida de Grupos:* Incorpora un **Panel Lateral Deslizante (Drawer)**. Al hacer clic en un grupo dentro del árbol de carpetas, se despliega un panel lateral de cristal donde puedes buscar y añadir/quitar usuarios de ese grupo de forma instantánea sin perder la posición en el árbol.
 
 ## 🚪 4. Cierre de Sesión
 
