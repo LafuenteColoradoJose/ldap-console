@@ -37,7 +37,7 @@ export class Users implements OnInit {
   private ouService = inject(OuService);
 
   users = signal<any[]>([]);
-  displayedColumns: string[] = ['connection', 'name', 'username', 'email', 'lastLogon', 'status', 'actions'];
+  displayedColumns: string[] = ['name', 'username', 'email', 'lastLogon', 'status', 'actions'];
   loading = signal(true);
 
   ngOnInit() {
@@ -242,15 +242,4 @@ export class Users implements OnInit {
     });
   }
 
-  isUserOnline(user: any): boolean {
-    const lastLogon = this.getUserValue(user, 'lastLogon');
-    if (!lastLogon || lastLogon === '0') return false;
-    
-    const fileTime = parseInt(lastLogon, 10);
-    if (isNaN(fileTime)) return false;
-    
-    const jsTime = (fileTime / 10000) - 11644473600000;
-    const THIRTY_MINUTES = 30 * 60 * 1000;
-    return (Date.now() - jsTime) < THIRTY_MINUTES;
-  }
 }

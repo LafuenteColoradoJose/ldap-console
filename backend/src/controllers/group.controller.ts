@@ -6,7 +6,7 @@ export class GroupController {
   static async getGroup(req: Request, res: Response): Promise<any> {
     try {
       const { name } = req.params;
-      const group = await GroupService.findGroup(name);
+      const group = await GroupService.findGroup(name as string);
       
       if (!group) {
         return res.status(404).json({ status: 'error', message: 'Grupo no encontrado.' });
@@ -43,7 +43,7 @@ export class GroupController {
   static async deleteGroup(req: Request, res: Response): Promise<any> {
     try {
       const { name } = req.params;
-      await GroupService.deleteGroup(name);
+      await GroupService.deleteGroup(name as string);
       return res.json({ status: 'success', message: `Grupo ${name} eliminado exitosamente.` });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
@@ -54,7 +54,7 @@ export class GroupController {
     try {
       const { name } = req.params;
       const { description } = req.body;
-      await GroupService.updateGroup(name, description);
+      await GroupService.updateGroup(name as string, description);
       return res.json({ status: 'success', message: 'Grupo actualizado correctamente.' });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
@@ -65,7 +65,7 @@ export class GroupController {
     try {
       const { name } = req.params;
       const { memberCN } = req.body;
-      await GroupService.addMember(name, memberCN);
+      await GroupService.addMember(name as string, memberCN as string);
       return res.json({ status: 'success', message: 'Miembro añadido correctamente.' });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
@@ -75,7 +75,7 @@ export class GroupController {
   static async removeMember(req: Request, res: Response): Promise<any> {
     try {
       const { name, memberCn } = req.params;
-      await GroupService.removeMember(name, memberCn);
+      await GroupService.removeMember(name as string, memberCn as string);
       return res.json({ status: 'success', message: 'Miembro eliminado correctamente.' });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });

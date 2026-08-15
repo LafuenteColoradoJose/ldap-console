@@ -48,7 +48,10 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     const onlineComputers = computers.filter(c => c.isOnline).length;
     
     // Total OUs (filtering out users and groups from the tree response)
-    const totalOus = allOus.filter(o => o.objectClass && o.objectClass.includes('organizationalUnit')).length;
+    const totalOus = allOus.filter(o => {
+      const objClassAttr = o.attributes?.find((a: any) => a.type === 'objectClass');
+      return objClassAttr && objClassAttr.values?.includes('organizationalUnit');
+    }).length;
     
     // OS Distribution
     const osStats = computers.reduce((acc: any, comp: any) => {

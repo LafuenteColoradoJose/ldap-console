@@ -35,18 +35,28 @@ export class ComputerService {
         const lastLogonTimestamp = this.getAttr(entry, 'lastLogonTimestamp');
         const lastLogon = this.getAttr(entry, 'lastLogon');
         
-        // Prefer lastLogon as it's more accurate for the current DC, fallback to lastLogonTimestamp
-        const bestLogon = lastLogon || lastLogonTimestamp;
-        
+        // Si no hay DNS HostName, intentamos usar el CN como hostname
+        let targetHost = dNSHostName || cn;
         let isOnline = false;
 
-        if (bestLogon && bestLogon !== '0') {
-          const fileTime = parseInt(bestLogon, 10);
-          if (!isNaN(fileTime)) {
-            const jsTime = (fileTime / 10000) - 11644473600000;
-            // Si el equipo contactó con el DC en los últimos 30 minutos
-            const THIRTY_MINUTES = 30 * 60 * 1000;
-            isOnline = (Date.now() - jsTime) < THIRTY_MINUTES;
+        if (targetHost && !targetHost.includes('.')) {
+          targetHost = `${targetHost}.corp.local`;
+        }
+
+        if (targetHost) {
+          try {
+            // Resolver la IP utilizando el servidor DNS del AD (192.168.1.142)
+            const { Resolver } = require('dns/promises');
+            const resolver = new Resolver();
+            resolver.setServers(['192.168.1.142']);
+            const addresses = await resolver.resolve4(targetHost);
+            const ip = addresses[0];
+
+            // Hacemos ping a la IP resuelta. '-c 1' = 1 paquete, '-W 1' = timeout de 1 segundo
+            await execAsync(`ping -c 1 -W 1 ${ip}`);
+            isOnline = true; // Si no lanza excepción, el ping funcionó
+          } catch (e) {
+            isOnline = false; // El ping falló (timeout o error DNS)
           }
         }
 

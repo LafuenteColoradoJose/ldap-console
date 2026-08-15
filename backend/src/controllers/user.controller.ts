@@ -6,7 +6,7 @@ export class UserController {
   static async getUser(req: Request, res: Response): Promise<any> {
     try {
       const { username } = req.params;
-      const user = await UserService.findUser(username);
+      const user = await UserService.findUser(username as string);
       
       if (!user) {
         return res.status(404).json({ status: 'error', message: 'Usuario no encontrado.' });
@@ -43,7 +43,7 @@ export class UserController {
   static async deleteUser(req: Request, res: Response): Promise<any> {
     try {
       const { cn } = req.params; // La función pide el CN exacto
-      await UserService.deleteUserByCN(cn);
+      await UserService.deleteUserByCN(cn as string);
       return res.json({ status: 'success', message: `Usuario ${cn} eliminado exitosamente.` });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
@@ -54,7 +54,7 @@ export class UserController {
     try {
       const { cn } = req.params;
       const { enable } = req.body;
-      await UserService.toggleUserStatus(cn, enable);
+      await UserService.toggleUserStatus(cn as string, enable);
       return res.json({ status: 'success', message: `Usuario ${enable ? 'habilitado' : 'deshabilitado'}.` });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
@@ -65,7 +65,7 @@ export class UserController {
     try {
       const { cn } = req.params;
       const { firstName, lastName, email } = req.body;
-      await UserService.updateUser(cn, { firstName, lastName, email });
+      await UserService.updateUser(cn as string, { firstName, lastName, email });
       return res.json({ status: 'success', message: 'Usuario actualizado correctamente.' });
     } catch (error: any) {
       return res.status(500).json({ status: 'error', message: error.message });
