@@ -16,8 +16,21 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     const totalUsers = users.length;
     
+    // Calculate disabled users based on userAccountControl
+    let activeUsers = 0;
+    let disabledUsers = 0;
+
     // Calculate last logon for users
     const usersWithLogon = users.map((u: any) => {
+      // Check userAccountControl
+      const uacAttr = u.attributes?.find((a: any) => a.type === 'userAccountControl');
+      const uac = parseInt(uacAttr?.values?.[0] || '0', 10);
+      if (!isNaN(uac) && (uac & 2) === 2) {
+        disabledUsers++;
+      } else {
+        activeUsers++;
+      }
+
       const lastLogonAttr = u.attributes?.find((a: any) => a.type === 'lastLogon');
       const lastLogon = lastLogonAttr?.values?.[0];
       let jsTime = 0;
@@ -33,8 +46,6 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         lastLogonTs: jsTime
       };
     });
-
-    const onlineUsers = usersWithLogon.filter(u => u.lastLogonTs > 0 && (Date.now() - u.lastLogonTs) < 30 * 60 * 1000).length;
     
     // Sort users by recent logon
     const recentLogins = usersWithLogon
@@ -75,7 +86,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
     res.json({
       status: 'success',
       data: {
-        users: { total: totalUsers, online: onlineUsers, recent: recentLogins },
+        users: { total: totalUsers, active: activeUsers, disabled: disabledUsers, recent: recentLogins },
         groups: { total: totalGroups },
         ous: { total: totalOus },
         computers: { total: totalComputers, online: onlineComputers, osStats }

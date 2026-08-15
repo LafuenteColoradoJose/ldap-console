@@ -40,12 +40,7 @@ export class Dashboard implements OnInit {
   loading = signal(true);
   stats = signal<DashboardStats | null>(null);
 
-  // Users chart options computed from stats
-  usersChartOptions = computed<RadialChartOptions>(() => {
-    const s = this.stats();
-    const pct = this.getPercentage(s?.users?.online, s?.users?.total);
-    return this.createRadialChartOptions([pct], ['Conectados'], ['#00e676']); // Neon green
-  });
+
 
   // Computers chart options computed from stats
   computersChartOptions = computed<RadialChartOptions>(() => {

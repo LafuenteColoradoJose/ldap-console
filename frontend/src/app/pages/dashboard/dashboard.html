@@ -30,15 +30,15 @@
             <div class="kpi-value">{{ stats()?.users?.total }}</div>
           </div>
         </div>
-        <div class="kpi-chart">
-          <apx-chart
-            [series]="usersChartOptions().series"
-            [chart]="usersChartOptions().chart"
-            [plotOptions]="usersChartOptions().plotOptions"
-            [colors]="usersChartOptions().colors"
-            [fill]="usersChartOptions().fill"
-            [labels]="usersChartOptions().labels"
-          ></apx-chart>
+        <div class="kpi-desc">
+          @if (stats()?.users?.disabled > 0) {
+            <span style="color: #ff5252; font-weight: 500;">
+              <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">warning</mat-icon>
+              {{ stats()?.users?.disabled }} cuentas deshabilitadas
+            </span>
+          } @else {
+            <span>{{ stats()?.users?.active }} cuentas activas</span>
+          }
         </div>
       </div>
 
@@ -131,7 +131,6 @@
                   <span class="activity-name">{{ user.fullName }} ({{ user.username }})</span>
                   <span class="activity-time">Inició sesión: {{ formatDate(user.lastLogonTs) }}</span>
                 </div>
-                <div class="activity-status online"></div>
               </div>
             } @empty {
               <div class="empty-state">

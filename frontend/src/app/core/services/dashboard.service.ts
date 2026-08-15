@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 export interface DashboardStats {
   users: { 
     total: number; 
-    online: number;
+    active: number;
+    disabled: number;
     recent?: { username: string, fullName: string, lastLogonTs: number }[];
   };
   groups: { total: number };
