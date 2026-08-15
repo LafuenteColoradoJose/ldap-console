@@ -27,7 +27,7 @@
           
           <div class="node-info">
             @if (node.type === 'ou') { <mat-icon color="primary" class="node-icon">folder</mat-icon> }
-            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon">group</mat-icon> }
+            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon" style="cursor: pointer" (click)="openGroupDrawer(node)">group</mat-icon> }
             @if (node.type === 'user') { <mat-icon [color]="node.isDisabled ? 'warn' : 'primary'" class="node-icon" [style.opacity]="node.isDisabled ? '1' : '0.7'">person</mat-icon> }
             @if (node.type === 'unknown') { <mat-icon class="node-icon">help_outline</mat-icon> }
             
@@ -63,7 +63,7 @@
           
           <div class="node-info">
             @if (node.type === 'ou') { <mat-icon color="primary" class="node-icon">folder_shared</mat-icon> }
-            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon">group</mat-icon> }
+            @if (node.type === 'group') { <mat-icon color="accent" class="node-icon" style="cursor: pointer" (click)="openGroupDrawer(node)">group</mat-icon> }
             
             <span class="node-name">{{ node.name }}</span>
             @if (node.description) { <mat-icon class="info-icon" [matTooltip]="node.description">info</mat-icon> }
@@ -93,4 +93,52 @@
     </mat-tree>
   </div>
   }
+
+  <!-- Glass Drawer for Group Members -->
+  <div class="glass-drawer-backdrop" *ngIf="drawerOpen" (click)="closeDrawer()"></div>
+  <div class="glass-drawer" [class.open]="drawerOpen">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <mat-icon color="accent">group</mat-icon>
+        <h2>{{ selectedGroup?.name }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeDrawer()"><mat-icon>close</mat-icon></button>
+    </div>
+    
+    <div class="drawer-content">
+      @if (drawerLoading) {
+        <div class="drawer-loading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      } @else {
+        <div class="drawer-search">
+          <mat-icon>search</mat-icon>
+          <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="filterUsers()" placeholder="Buscar usuario...">
+        </div>
+        
+        <div class="drawer-list">
+          @for (user of filteredUsers; track user.cn) {
+            <div class="member-item">
+              <div class="member-info">
+                <mat-icon color="primary">person</mat-icon>
+                <div>
+                  <strong>{{ user.name }}</strong>
+                  <small>{{ user.username }}</small>
+                </div>
+              </div>
+              <mat-slide-toggle 
+                color="primary"
+                [checked]="isMember(user)" 
+                (change)="toggleMembership(user, $event.checked)"
+                [disabled]="toggling[user.cn]">
+              </mat-slide-toggle>
+            </div>
+          }
+          @if (filteredUsers.length === 0) {
+            <div class="no-results">No se encontraron usuarios.</div>
+          }
+        </div>
+      }
+    </div>
+  </div>
 </div>
