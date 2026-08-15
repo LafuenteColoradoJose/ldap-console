@@ -11,8 +11,8 @@ Este archivo contiene el registro de los usuarios creados en el sistema para fac
 | Usuario (sAMAccountName) | Contraseña | Obligado a Cambiar | Notas |
 | :--- | :--- | :--- | :--- |
 | `prueba2` | `Usuario1.` | Sí | Usuario creado desde la interfaz web (Ldap Console). |
-| `prueba` | `UserPass2026!` | - | Nombre completo: "pp lafuente". Usuario principal o de pruebas. |
-| `test_strong` | `Hola12345!` | Sí | Usuario creado durante las pruebas de la API (Backend). |
+| `prueba` | `Usuario1.` | - | Nombre completo: "pp lafuente". Usuario principal o de pruebas. |
+| `test_strong` | `Usuario1.` | Sí | Usuario creado durante las pruebas de la API (Backend). |
 
 > **Nota sobre el primer inicio de sesión:**
 > Como hemos configurado la opción de "Obligar a cambiar la contraseña", la primera vez que intentes acceder a un cliente Linux/Windows unido al dominio con estos usuarios, el sistema te pedirá que introduzcas una nueva contraseña inmediatamente.
