@@ -53,6 +53,12 @@ docker compose logs -f
 ```
 Cuando leas *"Server Role: active directory domain controller"*, ¡estará listo!
 
+> ⚠️ **Importante sobre resolución DNS (Unión de Clientes):**
+> Si vas a unir clientes externos (Ubuntu, Debian, Windows) al dominio, es posible que el contenedor haya registrado su IP interna de Docker (ej. `172.x.x.x`) en los registros DNS en lugar de la IP del servidor físico. Si los clientes te dan error al hacer `realm join` o `nslookup`, debes actualizar el registro DNS manualmente dentro del contenedor:
+> ```bash
+> docker exec -it ldap-console-ad samba-tool dns update 127.0.0.1 corp.local @ A <IP_INTERNA_DOCKER> <IP_SERVIDOR_FISICO> -U Administrator --password=TuContraseña
+> ```
+
 ### 4. Ejecutar el Backend
 El backend está escrito en TypeScript y utiliza `tsx` para una ejecución de desarrollo rápida. Se conectará automáticamente al Samba4 que acabamos de levantar.
 

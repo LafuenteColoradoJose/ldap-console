@@ -22,7 +22,7 @@ La interfaz está diseñada bajo el patrón de **diseño responsivo**. Se adapta
 
 LDAP Console está dividido en varias secciones accesibles desde el menú lateral:
 
-*   **Dashboard (Panel de Control):** Portada de la aplicación que mostrará estadísticas generales del dominio (En desarrollo).
+*   **Dashboard (Panel de Control):** Portada interactiva de la aplicación con estética moderna (glassmorphism y modo oscuro) que muestra estadísticas globales del dominio, gráficos de distribución de sistemas operativos y KPIs de usuarios, equipos y Unidades Organizativas.
 *   **Gestión de Usuarios:** Permite crear, modificar, deshabilitar y eliminar cuentas de usuario. 
     *   *Indicador de Conexión:* Muestra un punto verde si el usuario se ha autenticado en el dominio en los últimos 30 minutos (basado en su `lastLogon`), o rojo si está desconectado.
 *   **Equipos (Computers):** Muestra todos los ordenadores y servidores que han sido unidos al Active Directory.
