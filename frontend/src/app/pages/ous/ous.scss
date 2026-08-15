@@ -178,14 +178,14 @@
 .text-disabled {
   text-decoration: line-through;
   opacity: 0.5;
-  color: #ff5252 !important;
+  color: var(--mat-sys-error) !important;
 }
 
 /* Node Icons Coloring */
-.node-ou .node-icon { color: #1976d2 !important; }
-.node-group .node-icon { color: #9c27b0 !important; }
-.node-user .node-icon { color: #009688 !important; }
-.node-user.text-disabled .node-icon { color: #f44336 !important; }
+.node-ou .node-icon { color: var(--mat-sys-tertiary) !important; }
+.node-group .node-icon { color: var(--mat-sys-secondary) !important; }
+.node-user .node-icon { color: var(--mat-sys-primary) !important; }
+.node-user.text-disabled .node-icon { color: var(--mat-sys-error) !important; }
 
 /* Light theme overrides */
 :host-context(.theme-light) {

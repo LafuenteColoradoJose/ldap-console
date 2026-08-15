@@ -1,16 +1,20 @@
 .dashboard-container {
-  /* Variables por defecto (Modo Claro) */
-  --dash-bg: #f8fafc; /* Gris muy suave */
-  --dash-text-title: #0f172a;
-  --dash-text-subtitle: #64748b;
-  --dash-glass-bg: rgba(255, 255, 255, 0.85);
-  --dash-glass-border: rgba(203, 213, 225, 0.6);
-  --dash-glass-shadow: rgba(15, 23, 42, 0.05);
-  --dash-glass-hover: rgba(255, 255, 255, 1);
-  --dash-icon-bg: rgba(15, 23, 42, 0.04);
-  --dash-icon-color: #475569;
-  --dash-activity-bg: rgba(255, 255, 255, 0.6);
-  --dash-activity-hover: #ffffff;
+  /* Utilizamos tokens del sistema de Material 3 que cambian automáticamente en modo claro/oscuro */
+  --dash-bg: var(--mat-sys-surface-container);
+  --dash-text-title: var(--mat-sys-on-surface);
+  --dash-text-subtitle: var(--mat-sys-on-surface-variant);
+  
+  /* Fondos de cristal translúcidos adaptativos */
+  --dash-glass-bg: var(--mat-sys-surface);
+  --dash-glass-border: var(--mat-sys-outline-variant);
+  --dash-glass-shadow: rgba(0, 0, 0, 0.05);
+  --dash-glass-hover: var(--mat-sys-surface-container-high);
+  
+  --dash-icon-bg: var(--mat-sys-surface-container-highest);
+  --dash-icon-color: var(--mat-sys-primary);
+  
+  --dash-activity-bg: var(--mat-sys-surface-container-low);
+  --dash-activity-hover: var(--mat-sys-surface-container);
 
   padding: 1.5rem;
   max-width: 1600px;
@@ -22,37 +26,6 @@
   border-radius: 16px;
   box-shadow: 0 10px 30px -10px var(--dash-glass-shadow);
   overflow-x: hidden;
-}
-
-/* Modo oscuro (cuando el body tiene .theme-dark o por sistema) */
-:host-context(body.theme-dark) .dashboard-container {
-  --dash-bg: #0f172a;
-  --dash-text-title: #f8fafc;
-  --dash-text-subtitle: #94a3b8;
-  --dash-glass-bg: rgba(255, 255, 255, 0.04);
-  --dash-glass-border: rgba(255, 255, 255, 0.08);
-  --dash-glass-shadow: rgba(0, 0, 0, 0.25);
-  --dash-glass-hover: rgba(255, 255, 255, 0.08);
-  --dash-icon-bg: rgba(255, 255, 255, 0.1);
-  --dash-icon-color: #cbd5e1;
-  --dash-activity-bg: rgba(0, 0, 0, 0.2);
-  --dash-activity-hover: rgba(255, 255, 255, 0.05);
-}
-
-@media (prefers-color-scheme: dark) {
-  :host-context(body:not(.theme-light)) .dashboard-container {
-    --dash-bg: #0f172a;
-    --dash-text-title: #f8fafc;
-    --dash-text-subtitle: #94a3b8;
-    --dash-glass-bg: rgba(255, 255, 255, 0.04);
-    --dash-glass-border: rgba(255, 255, 255, 0.08);
-    --dash-glass-shadow: rgba(0, 0, 0, 0.25);
-    --dash-glass-hover: rgba(255, 255, 255, 0.08);
-    --dash-icon-bg: rgba(255, 255, 255, 0.1);
-    --dash-icon-color: #cbd5e1;
-    --dash-activity-bg: rgba(0, 0, 0, 0.2);
-    --dash-activity-hover: rgba(255, 255, 255, 0.05);
-  }
 }
 
 .loading-state {
@@ -102,11 +75,12 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 1rem;
-    background: rgba(0, 230, 118, 0.05);
-    border: 1px solid rgba(0, 230, 118, 0.2);
+    background: var(--mat-sys-primary-container);
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 8px;
     
     .icon-success {
-      color: #00e676;
+      color: var(--mat-sys-on-primary-container);
       font-size: 1.5rem;
       width: 1.5rem;
       height: 1.5rem;
@@ -118,12 +92,13 @@
       
       .status-title {
         font-size: 0.75rem;
-        color: var(--dash-text-subtitle);
+        color: var(--mat-sys-on-primary-container);
+        opacity: 0.8;
       }
       .status-value {
         font-weight: 600;
         font-size: 0.95rem;
-        &.success { color: #00e676; }
+        color: var(--mat-sys-on-primary-container);
       }
     }
   }
@@ -158,10 +133,10 @@
         
         mat-icon { font-size: 20px; width: 20px; height: 20px; }
         
-        &.blue { background: rgba(0, 176, 255, 0.1); color: #00b0ff; }
-        &.pink { background: rgba(245, 0, 87, 0.1); color: #f50057; }
-        &.purple { background: rgba(213, 0, 249, 0.1); color: #d500f9; }
-        &.orange { background: rgba(255, 152, 0, 0.1); color: #ff9800; }
+        &.blue { background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent); color: var(--mat-sys-primary); }
+        &.pink { background: color-mix(in srgb, var(--mat-sys-tertiary) 10%, transparent); color: var(--mat-sys-tertiary); }
+        &.purple { background: color-mix(in srgb, var(--mat-sys-secondary) 10%, transparent); color: var(--mat-sys-secondary); }
+        &.orange { background: color-mix(in srgb, var(--mat-sys-error) 10%, transparent); color: var(--mat-sys-error); }
       }
 
       .kpi-data {
@@ -307,8 +282,8 @@
         height: 8px;
         border-radius: 50%;
         &.online {
-          background: #00e676;
-          box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
+          background: #10b981;
+          box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
         }
       }
     }

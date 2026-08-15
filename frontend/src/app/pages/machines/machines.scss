@@ -41,11 +41,11 @@ table {
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
   
   &.online {
-    background-color: #10b981; /* Tailwind emerald-500 */
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    background-color: #10b981; /* Emerald green for success */
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
   }
   
   &.offline {
-    background-color: #ef4444; /* Tailwind red-500 */
+    background-color: var(--mat-sys-error);
   }
 }

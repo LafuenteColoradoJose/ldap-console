@@ -4,14 +4,23 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use './m3-theme.scss' as custom_theme;
+
+:root {
+  --brand-cerulean: #1C6E8C;
+  --brand-charcoal: #274156;
+  --brand-taupe: #605856;
+  --brand-pale-slate: #D0CCD0;
+  --brand-white: #FBFCFF;
+}
 
 html {
   height: 100%;
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: custom_theme.$primary-palette,
+        tertiary: custom_theme.$tertiary-palette,
       ),
       typography: Roboto,
       density: 0,

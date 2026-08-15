@@ -46,7 +46,7 @@ export class Dashboard implements OnInit {
   computersChartOptions = computed<RadialChartOptions>(() => {
     const s = this.stats();
     const pct = this.getPercentage(s?.computers?.online, s?.computers?.total);
-    return this.createRadialChartOptions([pct], ['Encendidos'], ['#00b0ff']); // Neon blue
+    return this.createRadialChartOptions([pct], ['Encendidos'], ['var(--mat-sys-tertiary, #274156)']); 
   });
 
   // OS Distribution Chart
@@ -65,12 +65,18 @@ export class Dashboard implements OnInit {
         background: 'transparent',
         fontFamily: 'Inter, sans-serif'
       },
-      colors: ['#00e676', '#00b0ff', '#f50057', '#ffea00', '#d500f9'],
-      stroke: { show: true, colors: ['rgba(0,0,0,0.2)'], width: 2 },
+      colors: [
+        'var(--brand-cerulean, #1C6E8C)', 
+        'var(--brand-charcoal, #274156)', 
+        'var(--brand-taupe, #605856)', 
+        'var(--brand-pale-slate, #D0CCD0)', 
+        'var(--mat-sys-primary-container, #89d0f1)'
+      ],
+      stroke: { show: true, colors: ['var(--mat-sys-surface, transparent)'], width: 2 },
       dataLabels: { enabled: false },
       legend: {
         position: 'bottom',
-        labels: { colors: 'var(--text-color, #e0e0e0)' }
+        labels: { colors: 'var(--mat-sys-on-surface, #e0e0e0)' }
       },
       tooltip: { theme: 'dark' }
     };
@@ -124,7 +130,7 @@ export class Dashboard implements OnInit {
           startAngle: -90,
           endAngle: 90,
           track: {
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: 'var(--mat-sys-surface-container-high, rgba(255, 255, 255, 0.05))',
             margin: 5
           },
           dataLabels: {
@@ -133,7 +139,7 @@ export class Dashboard implements OnInit {
               offsetY: 0,
               fontSize: '16px',
               fontWeight: 600,
-              color: colors[0],
+              color: 'var(--mat-sys-on-surface)',
               formatter: function (val) {
                 return val + "%";
               }
@@ -142,13 +148,8 @@ export class Dashboard implements OnInit {
         }
       },
       fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'dark',
-          type: 'horizontal',
-          gradientToColors: [colors[0] + 'aa'],
-          stops: [0, 100]
-        }
+        type: 'solid',
+        colors: colors
       },
       labels
     };

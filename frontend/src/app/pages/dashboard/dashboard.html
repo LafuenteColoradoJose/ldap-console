@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="kpi-desc">
-          @if (stats()?.users?.disabled > 0) {
+          @if ((stats()?.users?.disabled || 0) > 0) {
             <span style="color: #ff5252; font-weight: 500;">
               <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">warning</mat-icon>
               {{ stats()?.users?.disabled }} cuentas deshabilitadas
