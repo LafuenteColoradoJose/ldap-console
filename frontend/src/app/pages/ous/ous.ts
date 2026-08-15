@@ -94,8 +94,10 @@ export class Ous implements OnInit {
     const rootNodes: OuNode[] = [];
     const map = new Map<string, OuNode>();
 
+    const normalizeDN = (dn: string) => dn.toLowerCase().replace(/,\s*/g, ',');
+
     ous.forEach(ou => {
-      map.set(ou.distinguishedName.toLowerCase(), {
+      map.set(normalizeDN(ou.distinguishedName), {
         name: ou.ou,
         dn: ou.distinguishedName,
         description: ou.description || '',
@@ -106,11 +108,12 @@ export class Ous implements OnInit {
     });
 
     ous.forEach(ou => {
-      const node = map.get(ou.distinguishedName.toLowerCase())!;
+      const normDN = normalizeDN(ou.distinguishedName);
+      const node = map.get(normDN)!;
       
-      const parts = ou.distinguishedName.split(',');
+      const parts = normDN.split(',');
       parts.shift(); // remove self
-      const parentDN = parts.join(',').toLowerCase();
+      const parentDN = parts.join(',');
       
       const parent = map.get(parentDN);
       if (parent) {
