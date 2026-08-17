@@ -1,5 +1,6 @@
 import { BASE_DN, getAdminClient, searchLdap } from './ldap.client';
 import ldap from 'ldapjs';
+import { telemetryService } from '../telemetry.service';
 
 export class UserService {
   static get USERS_BASE_DN() {
@@ -115,7 +116,31 @@ export class UserService {
         filter: '(&(objectClass=user)(!(objectClass=computer)))',
         attributes: ['sAMAccountName', 'givenName', 'sn', 'mail', 'userAccountControl', 'cn', 'memberOf', 'lastLogon', 'distinguishedName']
       });
-      return entries;
+
+      const users = await Promise.all(entries.map(async (entry: any) => {
+        const usernameAttr = entry.attributes.find((a: any) => a.type === 'sAMAccountName');
+        const username = usernameAttr && usernameAttr.values ? usernameAttr.values[0] : '';
+        
+        let isOnline = false;
+        let activeMachine = '';
+        
+        if (username) {
+          const machine = await telemetryService.getActiveMachineForUser(username);
+          if (machine) {
+            isOnline = true;
+            activeMachine = machine;
+          }
+        }
+        
+        entry.attributes.push({ type: 'isOnline', values: [String(isOnline)] });
+        if (activeMachine) {
+          entry.attributes.push({ type: 'activeMachine', values: [activeMachine] });
+        }
+        
+        return entry;
+      }));
+
+      return users;
     } finally {
       client.unbind();
     }

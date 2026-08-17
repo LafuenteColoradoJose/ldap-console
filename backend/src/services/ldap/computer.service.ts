@@ -1,8 +1,5 @@
 import { BASE_DN, getAdminClient, searchLdap } from './ldap.client';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
+import { telemetryService } from '../telemetry.service';
 
 export class ComputerService {
   private static COMPUTERS_BASE_DN = process.env.COMPUTERS_BASE_DN || 'CN=Computers,DC=corp,DC=local';
@@ -35,30 +32,7 @@ export class ComputerService {
         const lastLogonTimestamp = this.getAttr(entry, 'lastLogonTimestamp');
         const lastLogon = this.getAttr(entry, 'lastLogon');
         
-        // Si no hay DNS HostName, intentamos usar el CN como hostname
-        let targetHost = dNSHostName || cn;
-        let isOnline = false;
-
-        if (targetHost && !targetHost.includes('.')) {
-          targetHost = `${targetHost}.corp.local`;
-        }
-
-        if (targetHost) {
-          try {
-            // Resolver la IP utilizando el servidor DNS del AD (192.168.1.142)
-            const { Resolver } = require('dns/promises');
-            const resolver = new Resolver();
-            resolver.setServers(['192.168.1.142']);
-            const addresses = await resolver.resolve4(targetHost);
-            const ip = addresses[0];
-
-            // Hacemos ping a la IP resuelta. '-c 1' = 1 paquete, '-W 1' = timeout de 1 segundo
-            await execAsync(`ping -c 1 -W 1 ${ip}`);
-            isOnline = true; // Si no lanza excepción, el ping funcionó
-          } catch (e) {
-            isOnline = false; // El ping falló (timeout o error DNS)
-          }
-        }
+        const isOnline = await telemetryService.isMachineOnline(cn);
 
         return {
           dn: entry.objectName,

@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>Desplegar Telemetría</h2>
+<mat-dialog-content>
+  <p>Introduce las credenciales SSH para instalar el script de telemetría automáticamente. Solo válido para Linux.</p>
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Host / IP del equipo</mat-label>
+    <input matInput [(ngModel)]="host" required>
+  </mat-form-field>
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Usuario SSH</mat-label>
+    <input matInput [(ngModel)]="username" required>
+  </mat-form-field>
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Contraseña SSH</mat-label>
+    <input matInput type="password" [(ngModel)]="password" required>
+  </mat-form-field>
+  <p style="font-size: 0.8em; color: gray;"><i>Estas credenciales no se guardarán, solo se usarán para el despliegue actual.</i></p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="!host || !username || !password" (click)="onDeploy()">
+    Desplegar
+  </button>
+</mat-dialog-actions>

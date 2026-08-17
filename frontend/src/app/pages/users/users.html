@@ -28,7 +28,11 @@
         <th mat-header-cell *matHeaderCellDef> Nombre Completo </th>
         <td mat-cell *matCellDef="let user"> 
           <div class="td-icon-text">
-            <mat-icon class="text-primary">person</mat-icon>
+            <mat-icon [ngStyle]="{
+              'color': isUserDisabled(user) ? '#9e9e9e' : (getUserValue(user, 'isOnline') === 'true' ? '#10b981' : '#ef4444')
+            }" [matTooltip]="isUserDisabled(user) ? 'Usuario Deshabilitado' : (getUserValue(user, 'isOnline') === 'true' ? 'Usuario Activo en ' + getUserValue(user, 'activeMachine') : 'Usuario Inactivo')">
+              person
+            </mat-icon>
             <strong>{{ getUserValue(user, 'givenName') }} {{ getUserValue(user, 'sn') }}</strong>
           </div>
         </td>
@@ -68,7 +72,7 @@
           @if (isUserDisabled(user)) {
             <span class="status-badge disabled">Deshabilitado</span>
           } @else {
-            <span class="status-badge active">Activo</span>
+            <span class="status-badge active">Habilitado</span>
           }
         </td>
       </ng-container>

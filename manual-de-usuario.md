@@ -23,9 +23,12 @@ La interfaz está diseñada bajo el patrón de **diseño responsivo**. Se adapta
 LDAP Console está dividido en varias secciones accesibles desde el menú lateral:
 
 *   **Dashboard (Panel de Control):** Portada interactiva de la aplicación con estética moderna (glassmorphism y modo oscuro) que muestra estadísticas globales del dominio. Ahora cuenta de forma inteligente a los verdaderos usuarios (excluyendo a las cuentas de los propios ordenadores) para mostrar métricas exactas.
-*   **Gestión de Usuarios:** Permite crear, modificar, deshabilitar y eliminar cuentas de usuario.
+*   **Gestión de Usuarios:** Permite crear, modificar, deshabilitar y eliminar cuentas de usuario. Además, gracias a la **Telemetría**, el icono de perfil de cada usuario cambiará de color en tiempo real:
+    *   🟢 **Verde:** El usuario tiene sesión iniciada activamente en un equipo del dominio.
+    *   🔴 **Rojo:** El usuario no está conectado actualmente.
+    *   ⚪ **Gris:** La cuenta del usuario está deshabilitada (se muestra explícitamente el estado *Habilitado / Deshabilitado*).
 *   **Equipos (Computers):** Muestra todos los ordenadores y servidores que han sido unidos al Active Directory.
-    *   *Estado en Tiempo Real (Ping):* La aplicación resuelve la IP interna del equipo contra el servidor DNS del Active Directory y realiza un PING en tiempo real para verificar de forma infalible si el equipo está realmente encendido y conectado a la red.
+    *   *Estado en Tiempo Real (Telemetría/Heartbeat):* A diferencia de los clásicos escaneos de PING ICMP (que suelen ser bloqueados por firewalls de Windows), Ldap Console utiliza un script ligero (Heartbeat) que se ejecuta en los clientes de forma silenciosa cada 10 minutos para notificar su estado. Esto permite saber con total certeza si un equipo está encendido (icono verde) o apagado (icono rojo).
 *   **Estructura del Dominio:** Visualiza la jerarquía de las Unidades Organizativas (OU) y contenedores principales de tu AD.
     *   *Gestión rápida de Grupos:* Incorpora un **Panel Lateral Deslizante (Drawer)**. Al hacer clic en un grupo dentro del árbol de carpetas, se despliega un panel lateral de cristal donde puedes buscar y añadir/quitar usuarios de ese grupo de forma instantánea sin perder la posición en el árbol.
 

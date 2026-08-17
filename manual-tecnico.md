@@ -16,6 +16,7 @@ El proyecto sigue un enfoque **Monorepo**, separando claramente las responsabili
     *   **Seguridad**:
         *   Las peticiones internas al AD se realizan obligatoriamente mediante **LDAPS (puerto 636)**. Samba4 requiere conexiones seguras para operaciones sensibles (como autenticación por contraseña).
         *   La API REST emite un **JSON Web Token (JWT)** al autenticarse exitosamente, el cual es utilizado de forma *stateless* por el frontend.
+    *   **Base de Datos Secundaria (Telemetría)**: Se implementa una pequeña base de datos local SQLite (`telemetry.sqlite`) para persistir el estado de los equipos y usuarios conectados (Heartbeats) de manera paralela y sin sobrecargar el LDAP con escrituras constantes.
 
 3.  **Frontend (Capa de Presentación)**
     *   **Stack**: Angular 22 (Standalone Components) + Angular Material.

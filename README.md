@@ -5,6 +5,7 @@
 📚 **Documentación detallada:**
 * [Manual de Usuario](./manual-de-usuario.md)
 * [Manual Técnico](./manual-tecnico.md)
+* [Guía de Telemetría y Heartbeat](./guia-telemetria-clientes.md)
 
 ## 🏛️ Arquitectura del Proyecto
 

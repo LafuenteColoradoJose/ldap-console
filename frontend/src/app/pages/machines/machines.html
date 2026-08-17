@@ -18,21 +18,17 @@
     <div class="table-container glass-card">
       <table mat-table [dataSource]="computers" class="mat-elevation-z0">
         
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef class="w-16 text-center"> Estado </th>
-          <td mat-cell *matCellDef="let element" class="text-center">
-            <div class="status-indicator" [class.online]="element.isOnline" [class.offline]="!element.isOnline" 
-                 [matTooltip]="element.isOnline ? 'Equipo Conectado (Actividad en los últimos 30m)' : 'Equipo Desconectado'"></div>
-          </td>
-        </ng-container>
+
 
         <!-- Name Column -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> Nombre de Equipo </th>
           <td mat-cell *matCellDef="let element">
             <div class="flex items-center gap-2 font-medium">
-              <mat-icon class="text-secondary" style="transform: scale(0.9);">desktop_windows</mat-icon>
+              <mat-icon [ngStyle]="{
+                'color': element.isOnline ? '#10b981' : '#ef4444',
+                'font-weight': element.isOnline ? 'normal' : 'bold'
+              }" style="transform: scale(0.9);" [matTooltip]="element.isOnline ? 'Equipo Conectado' : 'Equipo Desconectado'">desktop_windows</mat-icon>
               {{element.cn}}
             </div>
           </td>
@@ -65,12 +61,24 @@
           </td>
         </ng-container>
 
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="text-right"> Acciones </th>
+          <td mat-cell *matCellDef="let element" class="text-right">
+            <button mat-icon-button color="primary" 
+                    matTooltip="Desplegar telemetría por SSH (Solo Linux)"
+                    (click)="openDeployDialog(element)">
+              <mat-icon>cloud_upload</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover-row"></tr>
 
         <!-- No Data Row -->
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell text-center py-8 text-muted" colspan="5">
+          <td class="mat-cell text-center py-8 text-muted" colspan="6">
             No se encontraron equipos en el dominio.
           </td>
         </tr>

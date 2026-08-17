@@ -6,7 +6,15 @@ import { UserController } from '../controllers/user.controller';
 import { ComputerController } from '../controllers/computer.controller';
 import { getDashboardStats } from '../controllers/dashboard.controller';
 
+import { TelemetryController } from '../controllers/telemetry.controller';
+
 const router = Router();
+
+// --- Rutas de Telemetría (Heartbeat) sin autenticación ---
+router.post('/telemetry/heartbeat', TelemetryController.registerHeartbeat);
+
+import { deployController } from '../controllers/deploy.controller';
+router.post('/telemetry/deploy-linux', deployController.deployTelemetry);
 
 // Middleware global para todas las rutas API a partir de aquí
 router.use(requireAuth);
